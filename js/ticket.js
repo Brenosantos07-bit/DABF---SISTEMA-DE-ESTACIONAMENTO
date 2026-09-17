@@ -1,8 +1,35 @@
-const parametros =
-    new URLSearchParams(window.location.search);
+const parametros = new URLSearchParams(window.location.search);
 
-const idTicket =
-    parametros.get("id");
+const idTicket = parametros.get("id");
+
+if (!idTicket) {
+    document.body.innerHTML = `
+        <div style="
+            min-height: 100vh;
+            background: #161616;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-family: Arial;
+            padding: 30px;
+        ">
+
+            <h2 style="margin-bottom: 10px;">
+                Ticket inválido
+            </h2>
+
+            <p style="color: #929292;">
+                Acesse seu ticket através do QR Code.
+            </p>
+
+        </div>
+    `;
+
+    throw new Error("Ticket sem identificador.");
+}
 
 console.log("Ticket recebido:", idTicket);
 
