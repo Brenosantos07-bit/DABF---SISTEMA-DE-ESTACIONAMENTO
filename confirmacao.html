@@ -3,6 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
+    <script src="https://unpkg.com/lucide@latest"></script>
 
     <meta
         name="viewport"
@@ -38,9 +39,6 @@
                 ✓
             </div>
 
-            <h1>
-                PAGAMENTO CONFIRMADO
-            </h1>
 
             <h2>
                 SAÍDA LIBERADA
@@ -56,68 +54,76 @@
 
         <section class="dados-confirmacao">
 
-            <div class="info">
+            <div class="info-confirmacao">
 
-                <span>Placa</span>
+                <i data-lucide="car"></i>
 
-                <strong id="placa">
-                    ---
-                </strong>
-
-            </div>
-
-
-            <div class="info">
-
-                <span>Vaga</span>
-
-                <strong id="vaga">
-                    ---
-                </strong>
+                <div>
+                    <span>Placa</span>
+                    <strong id="placa">---</strong>
+                </div>
 
             </div>
 
 
-            <div class="info">
+            <div class="info-confirmacao">
 
-                <span>Ticket Nº</span>
+                <i data-lucide="square-parking"></i>
 
-                <strong id="numeroTicket">
-                    ---
-                </strong>
-
-            </div>
-
-
-            <div class="info">
-
-                <span>Forma de pagamento</span>
-
-                <strong id="formaPagamento">
-                    ---
-                </strong>
+                <div>
+                    <span>Vaga</span>
+                    <strong id="vaga">---</strong>
+                </div>
 
             </div>
 
 
-            <div class="info">
+            <div class="info-confirmacao">
 
-                <span>Valor Pago</span>
+                <i data-lucide="ticket"></i>
 
-                <strong id="valorPago">
-                    ---
-                </strong>
+                <div>
+                    <span>Ticket Nº</span>
+                    <strong id="numeroTicket">---</strong>
+                </div>
 
             </div>
 
 
-            <div class="info">
+            <div class="info-confirmacao">
 
-                <span>Status</span>
+                <i data-lucide="wallet-cards"></i>
 
-                <strong class="status-pago">
-                    Pago
-                </strong>
+                <div>
+                    <span>Forma de pagamento</span>
+                    <strong id="formaPagamento">---</strong>
+                </div>
+
+            </div>
+
+
+            <div class="info-confirmacao">
+
+                <i data-lucide="coins"></i>
+
+                <div>
+                    <span>Valor Pago</span>
+                    <strong id="valorPago">---</strong>
+                </div>
+
+            </div>
+
+
+            <div class="info-confirmacao">
+
+                <i data-lucide="circle-check"></i>
+
+                <div>
+                    <span>Status</span>
+                    <strong class="status-pago">
+                        Pago
+                    </strong>
+                </div>
 
             </div>
 
@@ -126,14 +132,22 @@
 
         <section class="liberacao-automatica">
 
-            <strong>
-                ✓ Liberação automática por placa
-            </strong>
+            <div class="liberacao-icone">
+                <i data-lucide="circle-check"></i>
+            </div>
 
-            <p>
-                Sua saída será liberada automaticamente
-                pela leitura da placa do veículo.
-            </p>
+            <div class="liberacao-conteudo">
+
+                <strong>
+                    Liberação automática por placa
+                </strong>
+
+                <p>
+                    Sua saída será liberada automaticamente
+                    pela leitura da placa do veículo.
+                </p>
+
+            </div>
 
         </section>
 
@@ -147,7 +161,9 @@
     </main>
 
 
-    <script src="js/confirmacao.js"></script>
+    <script src="js/confirmacao.js"></script><script>
+    lucide.createIcons();
+    </script>
 
 </body>
 
