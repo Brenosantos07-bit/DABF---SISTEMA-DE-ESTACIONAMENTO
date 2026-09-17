@@ -1,0 +1,973 @@
+/* =========================================================
+   DABF - SISTEMA DE ESTACIONAMENTO
+   Front-end do Motorista
+========================================================= */
+
+
+/* =========================================================
+   1. RESET
+========================================================= */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+
+/* =========================================================
+   2. VARIÁVEIS
+========================================================= */
+
+:root {
+
+    --bg: #161616;
+
+    --card: #292929;
+    --card-hover: #303030;
+
+    --border: #404040;
+
+    --text: #ffffff;
+    --text-muted: #929292;
+
+    --yellow: #e6a915;
+
+    --green: #3eae67;
+    --green-hover: #47ba70;
+
+    --green-dark: #183524;
+    --green-border: #2f9650;
+
+}
+
+
+/* =========================================================
+   3. BODY
+========================================================= */
+
+body {
+
+    min-height: 100vh;
+
+    background: var(--bg);
+
+    color: var(--text);
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
+}
+
+
+/* =========================================================
+   4. CONTAINER PRINCIPAL
+========================================================= */
+
+.container {
+
+    width: 100%;
+
+    max-width: 430px;
+
+    min-height: 100vh;
+
+    margin: 0 auto;
+
+    padding: 30px 20px 35px;
+
+}
+
+
+/* =========================================================
+   5. CABEÇALHO
+========================================================= */
+
+header {
+
+    text-align: center;
+
+    margin-bottom: 30px;
+
+}
+
+
+.logo {
+
+    width: 95px;
+
+    height: auto;
+
+    margin-bottom: 20px;
+
+}
+
+
+header h1 {
+
+    font-size: 30px;
+
+    font-weight: 800;
+
+    margin-bottom: 7px;
+
+}
+
+
+header p {
+
+    color: var(--text-muted);
+
+    font-size: 14px;
+
+}
+
+
+/* =========================================================
+   6. BOTÕES GERAIS
+========================================================= */
+
+button {
+
+    width: 100%;
+
+    min-height: 53px;
+
+    border: none;
+
+    border-radius: 9px;
+
+    background: var(--green);
+
+    color: #ffffff;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 9px;
+
+    font-size: 15px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease;
+
+}
+
+
+button:hover {
+
+    background: var(--green-hover);
+
+    transform: translateY(-1px);
+
+}
+
+
+button:disabled {
+
+    opacity: 0.6;
+
+    cursor: not-allowed;
+
+    transform: none;
+
+}
+
+
+button svg {
+
+    width: 19px;
+
+    height: 19px;
+
+}
+
+
+
+
+/* =========================================================
+   9. PAGAMENTO - RESUMO
+========================================================= */
+
+.resumo-pagamento {
+
+    width: 100%;
+
+    background: var(--card);
+
+    border-radius: 18px;
+
+    padding: 8px 18px;
+
+    display: grid;
+
+    grid-template-columns:
+        1fr 1fr;
+
+    column-gap: 20px;
+
+    margin-bottom: 28px;
+
+    box-shadow:
+        0 8px 20px
+        rgba(0, 0, 0, 0.25);
+
+}
+
+
+.info-pagamento {
+
+    min-height: 72px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 11px;
+
+    border-bottom:
+        1px solid
+        var(--border);
+
+}
+
+
+.info-pagamento:nth-child(3),
+.info-pagamento:nth-child(4) {
+
+    border-bottom: none;
+
+}
+
+
+/* ÍCONES */
+
+.info-pagamento > svg {
+
+    width: 25px;
+
+    height: 25px;
+
+    min-width: 20px;
+
+    color: var(--yellow);
+
+    stroke-width: 2.2;
+
+}
+
+
+/* TEXTOS */
+
+.info-pagamento div {
+
+    min-width: 0;
+
+    display: flex;
+
+    flex-direction: column;
+
+}
+
+
+.info-pagamento span {
+
+    color: var(--text-muted);
+
+    font-size: 11px;
+
+    margin-bottom: 4px;
+
+}
+
+
+.info-pagamento strong {
+
+    color: var(--text);
+
+    font-size: 16px;
+
+    font-weight: 700;
+
+    white-space: nowrap;
+
+}
+
+
+/* =========================================================
+   10. PAGAMENTO - TÍTULO
+========================================================= */
+
+.titulo-metodos {
+
+    color: var(--text);
+
+    font-size: 19px;
+
+    font-weight: 700;
+
+    margin-bottom: 15px;
+
+}
+
+
+/* =========================================================
+   11. MÉTODOS DE PAGAMENTO
+========================================================= */
+
+.metodo-pagamento {
+
+    width: 100%;
+
+    min-height: 78px;
+
+    background: var(--card);
+
+    border:
+        2px solid
+        transparent;
+
+    border-radius: 14px;
+
+    padding: 14px 16px;
+
+    margin-bottom: 12px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 14px;
+
+    position: relative;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease;
+
+}
+
+
+.metodo-pagamento:hover {
+
+    background: var(--card-hover);
+
+}
+
+
+.metodo-pagamento.selecionado {
+
+    border-color: var(--yellow);
+
+}
+
+
+/* =========================================================
+   12. ÍCONES DOS MÉTODOS
+========================================================= */
+
+.metodo-icone {
+
+    width: 42px;
+
+    height: 42px;
+
+    min-width: 42px;
+
+    border-radius: 10px;
+
+    background:
+        rgba(
+            230,
+            169,
+            21,
+            0.10
+        );
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+}
+
+
+/* LUCIDE */
+
+.metodo-icone svg {
+
+    width: 23px;
+
+    height: 23px;
+
+    color: var(--yellow);
+
+    stroke-width: 2;
+
+}
+
+
+/* PIX - FONT AWESOME */
+
+.pix-icon {
+
+    color: var(--yellow);
+
+    font-size: 25px;
+
+}
+
+
+/* =========================================================
+   13. TEXTO DOS MÉTODOS
+========================================================= */
+
+.metodo-texto {
+
+    flex: 1;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 5px;
+
+}
+
+
+.metodo-texto strong {
+
+    color: var(--text);
+
+    font-size: 16px;
+
+    font-weight: 700;
+
+}
+
+
+.metodo-texto span {
+
+    color: var(--text-muted);
+
+    font-size: 12px;
+
+}
+
+
+/* =========================================================
+   14. RADIO BUTTON PERSONALIZADO
+========================================================= */
+
+
+/* ESCONDE O ORIGINAL */
+
+.metodo-pagamento input {
+
+    position: absolute;
+
+    opacity: 0;
+
+    pointer-events: none;
+
+}
+
+
+/* CÍRCULO */
+
+.radio-custom {
+
+    width: 20px;
+
+    height: 20px;
+
+    min-width: 20px;
+
+    border:
+        2px solid
+        #777777;
+
+    border-radius: 50%;
+
+    position: relative;
+
+}
+
+
+/* SELECIONADO */
+
+.metodo-pagamento
+input:checked + .radio-custom {
+
+    border-color: var(--yellow);
+
+}
+
+
+/* BOLINHA */
+
+.metodo-pagamento
+input:checked + .radio-custom::after {
+
+    content: "";
+
+    width: 10px;
+
+    height: 10px;
+
+    border-radius: 50%;
+
+    background: var(--yellow);
+
+    position: absolute;
+
+    top: 50%;
+
+    left: 50%;
+
+    transform:
+        translate(-50%, -50%);
+
+}
+
+
+/* =========================================================
+   15. TOTAL DO PAGAMENTO
+========================================================= */
+
+.total-pagamento {
+
+    width: 100%;
+
+    background: var(--card);
+
+    border-radius: 14px;
+
+    padding: 20px;
+
+    margin-top: 25px;
+
+    margin-bottom: 20px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+}
+
+
+.total-label {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 9px;
+
+    color: var(--text-muted);
+
+}
+
+
+.total-label svg {
+
+    width: 19px;
+
+    height: 19px;
+
+    color: var(--yellow);
+
+}
+
+
+.total-pagamento strong {
+
+    color: var(--text);
+
+    font-size: 22px;
+
+    font-weight: 700;
+
+}
+
+
+/* =========================================================
+   16. BOTÃO CONFIRMAR PAGAMENTO
+========================================================= */
+
+#confirmarPagamento {
+
+    width: 100%;
+
+    height: 53px;
+
+    border: none;
+
+    border-radius: 9px;
+
+    background: var(--green);
+
+    color: #ffffff;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 9px;
+
+    font-size: 14px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease;
+
+}
+
+
+#confirmarPagamento:hover {
+
+    background: var(--green-hover);
+
+    transform: translateY(-1px);
+
+}
+
+
+#confirmarPagamento svg {
+
+    width: 22px;
+
+    height: 22px;
+
+}
+
+
+/* =========================================================
+   17. VOLTAR
+========================================================= */
+
+.voltar {
+
+    display: block;
+
+    margin-top: 20px;
+
+    text-align: center;
+
+    color: #aaaaaa;
+
+    font-size: 14px;
+
+    text-decoration: none;
+
+    transition: color 0.2s ease;
+
+}
+
+
+.voltar:hover {
+
+    color: #ffffff;
+
+}
+
+
+/* =========================================================
+   18. CONFIRMAÇÃO
+========================================================= */
+
+.confirmacao {
+
+    text-align: center;
+
+    margin-bottom: 30px;
+
+}
+
+
+/* CHECK VERDE */
+
+.icone-sucesso {
+
+    width: 100px;
+
+    height: 100px;
+
+    margin:
+        0 auto 25px;
+
+    border:
+        5px solid
+        #42c96b;
+
+    border-radius: 50%;
+
+    color: #42c96b;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    font-size: 55px;
+
+    font-weight: bold;
+
+    box-shadow:
+        0 0 25px
+        rgba(
+            66,
+            201,
+            107,
+            0.15
+        );
+
+}
+
+
+.confirmacao h1 {
+
+    color: var(--text);
+
+    font-size: 25px;
+
+    margin-bottom: 15px;
+
+}
+
+
+.confirmacao h2 {
+
+    color: #42c96b;
+
+    font-size: 30px;
+
+    margin-bottom: 15px;
+
+}
+
+
+.confirmacao p {
+
+    color: var(--text-muted);
+
+    font-size: 14px;
+
+    line-height: 1.5;
+
+}
+
+
+/* =========================================================
+   19. DADOS DA CONFIRMAÇÃO
+========================================================= */
+
+.dados-confirmacao {
+
+    width: 100%;
+
+    background: var(--card);
+
+    border-radius: 18px;
+
+    padding: 8px 18px;
+
+    display: grid;
+
+    grid-template-columns:
+        1fr 1fr;
+
+    column-gap: 20px;
+
+    margin-bottom: 20px;
+
+    box-shadow:
+        0 8px 20px
+        rgba(0, 0, 0, 0.25);
+
+}
+
+
+.status-pago {
+
+    color: #42c96b;
+
+}
+
+
+/* =========================================================
+   20. LIBERAÇÃO AUTOMÁTICA
+========================================================= */
+
+.liberacao-automatica {
+
+    width: 100%;
+
+    background: var(--green-dark);
+
+    border:
+        1px solid
+        var(--green-border);
+
+    border-radius: 14px;
+
+    padding: 20px;
+
+    margin-bottom: 25px;
+
+}
+
+
+.liberacao-automatica strong {
+
+    color: #42c96b;
+
+}
+
+
+.liberacao-automatica p {
+
+    margin-top: 8px;
+
+    color: #aaaaaa;
+
+    font-size: 13px;
+
+    line-height: 1.5;
+
+}
+
+
+/* =========================================================
+   21. RESPONSIVIDADE
+========================================================= */
+
+@media (max-width: 380px) {
+
+    .container {
+
+        padding:
+            28px 15px 30px;
+
+    }
+
+
+    header h1 {
+
+        font-size: 26px;
+
+    }
+
+
+    .ticket,
+    .resumo-pagamento,
+    .dados-confirmacao {
+
+        padding-left: 13px;
+
+        padding-right: 13px;
+
+        column-gap: 10px;
+
+    }
+
+
+    .info,
+    .info-pagamento {
+
+        gap: 7px;
+
+    }
+
+
+    .info > svg,
+    .info-pagamento > svg {
+
+        width: 18px;
+
+        height: 18px;
+
+        min-width: 18px;
+
+    }
+
+
+    .info strong,
+    .info-pagamento strong {
+
+        font-size: 14px;
+
+    }
+
+
+    .metodo-pagamento {
+
+        padding:
+            13px 12px;
+
+        gap: 10px;
+
+    }
+
+
+    .metodo-icone {
+
+        width: 38px;
+
+        height: 38px;
+
+        min-width: 38px;
+
+    }
+
+
+    .pix-icon {
+
+        font-size: 22px;
+
+    }
+
+
+    .metodo-texto strong {
+
+        font-size: 15px;
+
+    }
+
+
+    .total-pagamento {
+
+        padding: 17px;
+
+    }
+
+
+    .total-pagamento strong {
+
+        font-size: 20px;
+
+    }
+
+}

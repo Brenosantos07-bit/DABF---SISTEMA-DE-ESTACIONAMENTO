@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Font Awesome - para o PIX -->
+<link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>DABF - Pagamento</title>
+
+    <link
+        rel="stylesheet"
+        href="css/style.css"
+    >
+</head>
+
+<body>
+
+    <main class="container">
+
+        <header>
+
+            <img
+                src="assets/LOGO DABF-REMOV.png"
+                alt="DABF"
+                class="logo"
+            >
+
+            <h1>PAGAMENTO</h1>
+
+            <p>
+                Escolha a forma de pagamento
+            </p>
+
+        </header>
+
+
+        <!-- RESUMO DO TICKET -->
+
+        <section class="resumo-pagamento">
+
+            <div class="info-pagamento">
+
+                <i data-lucide="car"></i>
+
+                <div>
+                    <span>Placa</span>
+                    <strong id="placa">---</strong>
+                </div>
+
+            </div>
+
+
+            <div class="info-pagamento">
+
+                <i data-lucide="square-parking"></i>
+
+                <div>
+                    <span>Vaga</span>
+                    <strong id="vaga">---</strong>
+                </div>
+
+            </div>
+
+
+            <div class="info-pagamento">
+
+                <i data-lucide="timer"></i>
+
+                <div>
+                    <span>Tempo</span>
+                    <strong id="tempo">---</strong>
+                </div>
+
+            </div>
+
+
+            <div class="info-pagamento">
+
+                <i data-lucide="coins"></i>
+
+                <div>
+                    <span>Total</span>
+                    <strong id="valor">---</strong>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <h2 class="titulo-metodos">
+            Métodos disponíveis
+        </h2>
+
+
+        <label class="metodo-pagamento selecionado">
+
+            <div class="metodo-icone">
+                <i class="fa-brands fa-pix pix-icon"></i>
+            </div>
+
+            <div class="metodo-texto">
+
+                <strong>PIX</strong>
+
+                <span>
+                    Pagamento instantâneo
+                </span>
+
+            </div>
+
+            <input
+                type="radio"
+                name="pagamento"
+                value="PIX"
+                checked
+            >
+
+            <span class="radio-custom"></span>
+
+        </label>
+
+
+        <label class="metodo-pagamento">
+
+            <div class="metodo-icone">
+                <i data-lucide="credit-card"></i>
+            </div>
+
+            <div class="metodo-texto">
+
+                <strong>Cartão</strong>
+
+                <span>
+                    Crédito ou débito
+                </span>
+
+            </div>
+
+            <input
+                type="radio"
+                name="pagamento"
+                value="Cartão"
+            >
+
+            <span class="radio-custom"></span>
+
+        </label>
+
+
+    
+
+        <!-- TOTAL -->
+
+        <section class="total-pagamento">
+
+            <div class="total-label">
+
+                <i data-lucide="wallet"></i>
+
+                <span>Total a pagar</span>
+
+            </div>
+
+            <strong id="total">
+                R$ 0,00
+            </strong>
+
+        </section>
+
+
+        <button id="confirmarPagamento">
+
+            <i data-lucide="credit-card"></i>
+
+            CONFIRMAR PAGAMENTO
+
+        </button>
+
+
+        <a
+            href="#"
+            id="voltarTicket"
+            class="voltar"
+        >
+
+            Voltar para o ticket
+
+        </a>
+
+    </main>
+
+
+    <script src="js/pagamento.js"></script>
+    <script>
+    lucide.createIcons();
+    </script>
+
+</body>
+
+</html>

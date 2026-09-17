@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>DABF - Ticket Digital</title>
+
+    <link rel="stylesheet" href="css/ticket.css">
+
+    <script
+        src="https://unpkg.com/lucide@latest"
+        defer>
+    </script>
+
+    <script
+        src="js/ticket.js"
+        defer>
+    </script>
+</head>
+
+
+<body>
+
+    <main class="ticket-page">
+
+        <!-- LOGO -->
+
+        <header class="ticket-header">
+
+            <img
+                src="assets/LOGO DABF-REMOV.png"
+                alt="DABF"
+                class="logo"
+            >
+    
+            <h1>TICKET DIGITAL</h1>
+
+            <p>Seu ticket já está pronto</p>
+
+        </header>
+
+
+        <!-- DADOS DO TICKET -->
+
+        <section class="ticket-card">
+
+            <div class="ticket-info">
+
+                <i data-lucide="car"></i>
+
+                <div>
+                    <span>Placa</span>
+
+                    <strong id="placa">
+                        ---
+                    </strong>
+                </div>
+
+            </div>
+
+
+            <div class="ticket-info">
+
+                <i data-lucide="square-parking"></i>
+
+                <div>
+                    <span>Vaga</span>
+
+                    <strong id="vaga">
+                        ---
+                    </strong>
+                </div>
+
+            </div>
+
+
+            <div class="ticket-info">
+
+                <i data-lucide="clock-3"></i>
+
+                <div>
+                    <span>Entrada</span>
+
+                    <strong id="entrada">
+                        ---
+                    </strong>
+                </div>
+
+            </div>
+
+
+            <div class="ticket-info">
+
+                <i data-lucide="timer"></i>
+
+                <div>
+                    <span>Tempo</span>
+
+                    <strong id="tempo">
+                        ---
+                    </strong>
+                </div>
+
+            </div>
+
+
+            <div class="ticket-info ultimo">
+
+                <i data-lucide="ticket"></i>
+
+                <div>
+                    <span>Ticket Nº</span>
+
+                    <strong id="numeroTicket">
+                        ---
+                    </strong>
+                </div>
+
+            </div>
+
+
+            <div class="ticket-info ultimo">
+
+                <i data-lucide="coins"></i>
+
+                <div>
+                    <span>Valor Atual</span>
+
+                    <strong id="valor">
+                        ---
+                    </strong>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- STATUS -->
+
+        <section class="status-card">
+
+            <div class="status-icon">
+
+                <i data-lucide="shield-check"></i>
+
+            </div>
+
+
+            <div class="status-content">
+
+                <strong>Ticket ativo</strong>
+
+                <span>
+                    Seu estacionamento está em andamento
+                </span>
+
+            </div>
+
+        </section>
+
+
+        <!-- BOTÃO -->
+
+        <button
+            id="pagar"
+            class="btn-pagar"
+        >
+
+            <i data-lucide="credit-card"></i>
+
+            <span>PAGAR AGORA</span>
+
+        </button>
+
+    </main>
+
+
+    <script>
+        window.addEventListener("load", function () {
+            lucide.createIcons();
+        });
+    </script>
+
+</body>
+
+</html>
