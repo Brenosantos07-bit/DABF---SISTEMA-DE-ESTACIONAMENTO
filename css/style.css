@@ -198,6 +198,121 @@ button svg {
 /* =========================================================
    9. PAGAMENTO - RESUMO
 ========================================================= */
+/* =========================================================
+   PAGAMENTO - AJUSTE PARA CABER NA TELA
+========================================================= */
+
+.pagina-pagamento {
+    min-height: 100dvh;
+
+    padding-top: 10px;
+    padding-bottom: 12px;
+}
+
+
+/* CABEÇALHO MAIS COMPACTO */
+
+.pagina-pagamento header {
+    margin-bottom: 16px;
+}
+
+
+.pagina-pagamento .logo {
+    width: 140px;
+
+    margin-bottom: 0px;
+}
+
+
+.pagina-pagamento header h1 {
+    font-size: 30px;
+
+    margin-bottom: 4px;
+}
+
+
+.pagina-pagamento header p {
+    font-size: 12px;
+}
+
+
+/* RESUMO */
+
+.pagina-pagamento .resumo-pagamento {
+    margin-bottom: 18px;
+
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+
+.pagina-pagamento .info-pagamento {
+    min-height: 60px;
+}
+
+
+/* MÉTODOS */
+
+.pagina-pagamento .titulo-metodos {
+    font-size: 17px;
+
+    margin-bottom: 10px;
+}
+
+
+.pagina-pagamento .metodo-pagamento {
+    min-height: 66px;
+
+    padding: 10px 14px;
+
+    margin-bottom: 9px;
+}
+
+
+.pagina-pagamento .metodo-icone {
+    width: 38px;
+    height: 38px;
+
+    min-width: 38px;
+}
+
+
+.pagina-pagamento .metodo-icone svg {
+    width: 21px;
+    height: 21px;
+}
+
+
+.pagina-pagamento .pix-icon {
+    font-size: 22px;
+}
+
+
+/* TOTAL */
+
+.pagina-pagamento .total-pagamento {
+    margin-top: 16px;
+
+    margin-bottom: 12px;
+
+    padding: 15px 18px;
+}
+
+
+/* BOTÃO */
+
+.pagina-pagamento #confirmarPagamento {
+    height: 48px;
+}
+
+
+/* LINK VOLTAR */
+
+.pagina-pagamento .voltar {
+    margin-top: 12px;
+
+    font-size: 12px;
+}
 
 .resumo-pagamento {
 
@@ -691,12 +806,92 @@ input:checked + .radio-custom::after {
     color: #ffffff;
 
 }
+@media (max-height: 700px) {
 
+    .pagina-pagamento {
+        padding-top: 6px;
+    }
+
+    .pagina-pagamento .logo {
+        width: 62px;
+        margin-bottom: 4px;
+    }
+
+    .pagina-pagamento header {
+        margin-bottom: 11px;
+    }
+
+    .pagina-pagamento header h1 {
+        font-size: 24px;
+    }
+
+    .pagina-pagamento .resumo-pagamento {
+        margin-bottom: 13px;
+    }
+
+    .pagina-pagamento .info-pagamento {
+        min-height: 55px;
+    }
+
+    .pagina-pagamento .metodo-pagamento {
+        min-height: 60px;
+        padding: 8px 12px;
+    }
+
+    .pagina-pagamento .total-pagamento {
+        margin-top: 12px;
+        margin-bottom: 10px;
+        padding: 13px 16px;
+    }
+
+    .pagina-pagamento #confirmarPagamento {
+        height: 46px;
+    }
+
+    .pagina-pagamento .voltar {
+        margin-top: 8px;
+    }
+}
 
 /* =========================================================
    TELA DE CONFIRMAÇÃO
 ========================================================= */
+/* TELA DE CONFIRMAÇÃO MAIS COMPACTA */
 
+.pagina-confirmacao {
+    padding-top: 10px;
+}
+
+
+/* LOGO */
+
+.pagina-confirmacao header {
+    margin-bottom: 8px;
+}
+
+.pagina-confirmacao .logo {
+    width: 72px;
+    margin-bottom: 4px;
+}
+
+
+/* ÍCONE VERDE */
+
+.pagina-confirmacao .icone-sucesso {
+    width: 85px;
+    height: 85px;
+
+    margin: 5px auto 15px;
+
+    font-size: 48px;
+}
+
+
+/* BLOCO DA CONFIRMAÇÃO */
+
+.pagina-confirmacao .confirmacao {
+    margin-bottom: 20px;
+}
 .confirmacao {
     text-align: center;
     margin-bottom: 28px;
@@ -709,7 +904,7 @@ input:checked + .radio-custom::after {
     width: 100px;
     height: 100px;
 
-    margin: 15px auto 28px;
+    margin: 5px auto 15px;
 
     border: 5px solid #42c96b;
     border-radius: 50%;
