@@ -1,14 +1,14 @@
 # DABF — Backend (FastAPI)
 
 Backend único do projeto. Front do motorista, Dashboard e automação
-conversam **apenas** com esta API — ninguém acessa o SQLite diretamente.
+conversam **apenas** com esta API ninguém acessa o SQLite diretamente.
 
 ## Como rodar
 
 ```bash
 cd backend
 python -m venv venv
-source venv/bin/activate        # Windows: venv\Scripts\activate
+venv\Scripts\activate
 pip install -r requirements.txt
 
 python -m database.init_db      # cria backend/database/dabf.db + vagas de teste
