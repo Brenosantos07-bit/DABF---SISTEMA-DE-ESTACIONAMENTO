@@ -1,0 +1,307 @@
+/**
+ * auth.css — Alan
+ *
+ * A imagem em assets/garagem-bg.jpg (enviada pela equipe, gerada por
+ * IA pra esse projeto) já traz TODA a composição visual pronta — logo,
+ * títulos, recursos, placas, legenda, rodapé — tudo desenhado dentro
+ * da própria foto. Por isso ela vira o fundo da página inteira, e o
+ * HTML real (topbar, textos, rodapé) fica com a classe .sr-only:
+ * continua no código pra acessibilidade/leitor de tela e pra não
+ * depender só de texto dentro de uma imagem (não dá pra editar,
+ * traduzir ou redimensionar texto de bitmap), mas não aparece
+ * visualmente por cima da imagem, que já mostra tudo isso.
+ *
+ * O único elemento realmente visível por cima da imagem é o cartão de
+ * login/cadastro — que é interativo de verdade (inputs, botão),
+ * então PRECISA ser HTML mesmo.
+ */
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.authv2 {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  background-color: #08080a;
+  background-image: url("../assets/garagem-bg.jpg");
+  background-size: cover;
+  background-position: center;
+}
+
+/* Card flutuante — posicionado igual ao mockup: um pouco à direita do
+   centro da tela, sobre a foto. */
+.authv2__body {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 24px;
+}
+
+.authv2-card {
+  width: 100%;
+  max-width: 480px;
+  background: color-mix(in srgb, var(--card) 88%, transparent);
+  backdrop-filter: blur(10px);
+  border: 1px solid color-mix(in srgb, var(--accent) 16%, var(--border));
+  border-radius: 20px;
+  padding: 34px 36px 30px;
+  box-shadow: 0 30px 70px -16px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(0, 0, 0, 0.2),
+    0 0 60px -20px color-mix(in srgb, var(--accent) 35%, transparent);
+}
+
+@media (max-width: 520px) {
+  .authv2-card {
+    padding: 26px 22px 24px;
+  }
+}
+
+.authv2-card__logo {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 14px;
+}
+
+.authv2-card__logo img {
+  height: 60px;
+  width: auto;
+}
+
+.authv2-card__title {
+  text-align: center;
+  font-size: 21px;
+  margin: 0 0 8px;
+}
+
+.authv2-card__subtitle {
+  text-align: center;
+  color: var(--muted);
+  font-size: 12.5px;
+  line-height: 1.6;
+  margin: 0 0 24px;
+}
+
+.authv2-field {
+  position: relative;
+  margin-bottom: 13px;
+}
+
+.authv2-field__icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--muted);
+  display: flex;
+  pointer-events: none;
+}
+
+.authv2-field input,
+.authv2-field select {
+  width: 100%;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 13px 14px 13px 42px;
+  color: var(--text);
+  font-size: 13.5px;
+  font-family: inherit;
+}
+
+.authv2-field select {
+  appearance: none;
+  -webkit-appearance: none;
+  padding-right: 34px;
+}
+
+.authv2-field input:focus-visible,
+.authv2-field select:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -1px;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 18%, transparent);
+}
+
+.authv2-field--toggle input {
+  padding-right: 42px;
+}
+
+.authv2-field__toggle {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  display: flex;
+  padding: 4px;
+}
+
+.authv2-field__toggle.is-visivel {
+  color: var(--accent);
+}
+
+.authv2-row-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+@media (max-width: 480px) {
+  .authv2-row-split {
+    grid-template-columns: 1fr;
+  }
+}
+
+.authv2-options {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+  margin: 6px 0 20px;
+}
+
+.authv2-remember {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-dim);
+}
+
+.authv2-remember input {
+  width: 17px;
+  height: 17px;
+  accent-color: var(--accent);
+}
+
+.authv2-link {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.authv2-link:hover {
+  text-decoration: underline;
+}
+
+.authv2-submit {
+  width: 100%;
+  background: linear-gradient(135deg, #f0bb4e, var(--accent) 60%, #c98c1d);
+  color: #1a1206;
+  border: none;
+  border-radius: 10px;
+  padding: 15px;
+  font-size: 14.5px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  cursor: pointer;
+  margin-top: 6px;
+  box-shadow: 0 8px 22px -6px color-mix(in srgb, var(--accent) 65%, transparent);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.authv2-submit:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 26px -6px color-mix(in srgb, var(--accent) 75%, transparent);
+}
+
+.authv2-submit:active {
+  transform: translateY(0);
+}
+
+.authv2-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--muted);
+  font-size: 11px;
+  margin: 22px 0;
+}
+
+.authv2-divider::before,
+.authv2-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.authv2-footer-text {
+  text-align: center;
+  font-size: 12.5px;
+  color: var(--text-dim);
+  margin: 0;
+}
+
+/* Selos de confiança no rodapé do cartão */
+.authv2-trust {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: nowrap;
+  gap: 12px;
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.authv2-trust__item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--text-dim);
+  font-size: 10.5px;
+  white-space: nowrap;
+}
+
+.authv2-trust__item svg {
+  color: var(--accent);
+  flex-shrink: 0;
+  width: 13px;
+  height: 13px;
+}
+
+@media (max-width: 480px) {
+  .authv2-trust {
+    flex-wrap: wrap;
+    gap: 6px 14px;
+  }
+}
+
+.authv2-error {
+  background: color-mix(in srgb, var(--alert) 16%, transparent);
+  color: var(--alert);
+  border: 1px solid color-mix(in srgb, var(--alert) 40%, transparent);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 12.5px;
+  margin-bottom: 14px;
+}
+
+.authv2-success {
+  background: color-mix(in srgb, var(--confirm) 16%, transparent);
+  color: var(--confirm);
+  border: 1px solid color-mix(in srgb, var(--confirm) 40%, transparent);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 12.5px;
+  margin-bottom: 14px;
+}
