@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DABF — Entrar</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/auth.css" />
+</head>
+<body>
+  <div class="authv2">
+    <!-- Marca, headline, recursos e rodapé já estão desenhados dentro
+         de assets/garagem-bg.jpg (fundo da página, ver css/auth.css).
+         O texto abaixo fica só pra acessibilidade/leitor de tela —
+         não aparece visualmente por cima da imagem. -->
+    <div class="sr-only">
+      <p>DABF | Sistema de Estacionamento — Tecnologia que mantém você em movimento</p>
+      <h1>Seu estacionamento em movimento</h1>
+      <p>Mais controle, mais segurança e mais resultados para o seu negócio.</p>
+      <ul>
+        <li>Operação mais segura — Monitoramento em tempo real</li>
+        <li>Controle em tempo real — Informações sempre atualizadas</li>
+        <li>Gestão mais eficiente — Tudo em um só lugar</li>
+      </ul>
+      <p>© 2026 DABF. Todos os direitos reservados. v1.0.0</p>
+    </div>
+
+    <div class="authv2__body">
+      <div class="authv2-card">
+        <div class="authv2-card__logo">
+          <img src="../assets/LOGO DABF-REMOV.png" alt="DABF">
+        </div>
+        <h2 class="authv2-card__title">Bem-vindo de volta!</h2>
+        <p class="authv2-card__subtitle">
+          Acesse o painel de monitoramento do DABF e gerencie seu
+          estacionamento em tempo real.
+        </p>
+
+        <div class="authv2-error" id="login-erro" hidden></div>
+        <div class="authv2-success" id="login-sucesso" hidden></div>
+
+        <form id="login-form">
+          <div class="authv2-field">
+            <span class="authv2-field__icon" id="icon-email"></span>
+            <input type="email" id="login-email" placeholder="E-mail" required autocomplete="username">
+          </div>
+
+          <div class="authv2-field authv2-field--toggle">
+            <span class="authv2-field__icon" id="icon-senha"></span>
+            <input type="password" id="login-senha" placeholder="Senha" required autocomplete="current-password">
+            <button type="button" class="authv2-field__toggle" id="toggle-login-senha" aria-label="Mostrar senha">
+              <span id="icon-olho"></span>
+            </button>
+          </div>
+
+          <div class="authv2-options">
+            <label class="authv2-remember">
+              <input type="checkbox" id="login-lembrar" checked>
+              Lembrar de mim
+            </label>
+            <a href="#" class="authv2-link" id="link-esqueci">Esqueceu a senha?</a>
+          </div>
+
+          <button type="submit" class="authv2-submit">
+            <span id="icon-seta"></span>
+            Entrar
+          </button>
+        </form>
+
+        <div class="authv2-divider">ou</div>
+
+        <p class="authv2-footer-text">
+          Não tem conta? <a href="cadastro.html" class="authv2-link">Crie sua conta.</a>
+        </p>
+
+        <div class="authv2-trust">
+          <span class="authv2-trust__item"><span id="trust-icon-1"></span>Conexão segura</span>
+          <span class="authv2-trust__item"><span id="trust-icon-2"></span>Sistema em tempo real</span>
+          <span class="authv2-trust__item"><span id="trust-icon-3"></span>Alta disponibilidade</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Modal de redefinir senha — tudo local (localStorage), sem
+       e-mail de verdade, já que não existe backend de autenticação. -->
+  <div class="modal-overlay" id="esqueci-modal">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="esqueci-titulo">
+      <button type="button" class="modal-close" id="esqueci-close" aria-label="Fechar">&times;</button>
+      <h3 class="modal-code" id="esqueci-titulo">Redefinir senha</h3>
+      <p class="modal-block">Confirme seu e-mail e já defina uma senha nova.</p>
+
+      <div class="authv2-error" id="esqueci-erro" hidden></div>
+      <div class="authv2-success" id="esqueci-sucesso" hidden></div>
+
+      <form id="esqueci-form">
+        <div class="authv2-field">
+          <span class="authv2-field__icon" id="icon-esqueci-email"></span>
+          <input type="email" id="esqueci-email" placeholder="Seu e-mail" required autocomplete="username">
+        </div>
+        <div class="authv2-field authv2-field--toggle">
+          <span class="authv2-field__icon" id="icon-esqueci-senha"></span>
+          <input type="password" id="esqueci-senha" placeholder="Nova senha" required minlength="6" autocomplete="new-password">
+          <button type="button" class="authv2-field__toggle" id="toggle-esqueci-senha" aria-label="Mostrar senha">
+            <span id="icon-esqueci-olho1"></span>
+          </button>
+        </div>
+        <div class="authv2-field authv2-field--toggle">
+          <span class="authv2-field__icon" id="icon-esqueci-senha2"></span>
+          <input type="password" id="esqueci-confirmar" placeholder="Confirmar nova senha" required minlength="6" autocomplete="new-password">
+          <button type="button" class="authv2-field__toggle" id="toggle-esqueci-confirmar" aria-label="Mostrar senha">
+            <span id="icon-esqueci-olho2"></span>
+          </button>
+        </div>
+        <button type="submit" class="authv2-submit">Redefinir senha</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/icons.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    document.getElementById("icon-email").innerHTML = ICONS.mail;
+    document.getElementById("icon-senha").innerHTML = ICONS.lock;
+    document.getElementById("icon-olho").innerHTML = ICONS.eye;
+    document.getElementById("icon-seta").innerHTML = ICONS.arrowRight;
+    document.getElementById("trust-icon-1").innerHTML = ICONS.shield;
+    document.getElementById("trust-icon-2").innerHTML = ICONS.clock;
+    document.getElementById("trust-icon-3").innerHTML = ICONS.cloud;
+    document.getElementById("icon-esqueci-email").innerHTML = ICONS.mail;
+    document.getElementById("icon-esqueci-senha").innerHTML = ICONS.lock;
+    document.getElementById("icon-esqueci-senha2").innerHTML = ICONS.lock;
+    document.getElementById("icon-esqueci-olho1").innerHTML = ICONS.eye;
+    document.getElementById("icon-esqueci-olho2").innerHTML = ICONS.eye;
+
+    seedOperadorPadrao();
+
+    ligarToggleSenha("toggle-login-senha", "login-senha");
+    document.getElementById("toggle-login-senha").addEventListener("click", () => {
+      const visivel = document.getElementById("login-senha").type === "text";
+      document.getElementById("icon-olho").innerHTML = visivel ? ICONS.eyeOff : ICONS.eye;
+    });
+
+    ligarToggleSenha("toggle-esqueci-senha", "esqueci-senha");
+    ligarToggleSenha("toggle-esqueci-confirmar", "esqueci-confirmar");
+    document.getElementById("toggle-esqueci-senha").addEventListener("click", () => {
+      const visivel = document.getElementById("esqueci-senha").type === "text";
+      document.getElementById("icon-esqueci-olho1").innerHTML = visivel ? ICONS.eyeOff : ICONS.eye;
+    });
+    document.getElementById("toggle-esqueci-confirmar").addEventListener("click", () => {
+      const visivel = document.getElementById("esqueci-confirmar").type === "text";
+      document.getElementById("icon-esqueci-olho2").innerHTML = visivel ? ICONS.eyeOff : ICONS.eye;
+    });
+
+    // Modal de "Esqueceu a senha?" — abre/fecha
+    const esqueciModal = document.getElementById("esqueci-modal");
+    function abrirEsqueciModal() {
+      document.getElementById("esqueci-erro").hidden = true;
+      document.getElementById("esqueci-sucesso").hidden = true;
+      document.getElementById("esqueci-form").reset();
+      esqueciModal.classList.add("is-open");
+      document.getElementById("esqueci-email").focus();
+    }
+    function fecharEsqueciModal() {
+      esqueciModal.classList.remove("is-open");
+    }
+
+    document.getElementById("link-esqueci").addEventListener("click", (e) => {
+      e.preventDefault();
+      abrirEsqueciModal();
+    });
+    document.getElementById("esqueci-close").addEventListener("click", fecharEsqueciModal);
+    esqueciModal.addEventListener("click", (e) => {
+      if (e.target === esqueciModal) fecharEsqueciModal();
+    });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && esqueciModal.classList.contains("is-open")) fecharEsqueciModal();
+    });
+
+    document.getElementById("esqueci-form").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const email = document.getElementById("esqueci-email").value;
+      const novaSenha = document.getElementById("esqueci-senha").value;
+      const confirmarSenha = document.getElementById("esqueci-confirmar").value;
+
+      const erroEl = document.getElementById("esqueci-erro");
+      const sucessoEl = document.getElementById("esqueci-sucesso");
+      erroEl.hidden = true;
+      sucessoEl.hidden = true;
+
+      const erro = redefinirSenha(email, novaSenha, confirmarSenha);
+      if (erro) {
+        erroEl.textContent = erro;
+        erroEl.hidden = false;
+        return;
+      }
+
+      sucessoEl.textContent = "Senha redefinida! Pode fazer login com a senha nova.";
+      sucessoEl.hidden = false;
+      document.getElementById("esqueci-form").reset();
+      setTimeout(fecharEsqueciModal, 1800);
+    });
+
+    // Se já tem sessão, não faz sentido ficar na tela de login.
+    if (obterSessao()) {
+      window.location.href = "index.html";
+    }
+
+    if (new URLSearchParams(window.location.search).get("criado") === "1") {
+      const sucessoEl = document.getElementById("login-sucesso");
+      sucessoEl.textContent = "Conta criada com sucesso! Faça login pra continuar.";
+      sucessoEl.hidden = false;
+    }
+
+    document.getElementById("login-form").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const email = document.getElementById("login-email").value;
+      const senha = document.getElementById("login-senha").value;
+      const lembrar = document.getElementById("login-lembrar").checked;
+
+      const erroEl = document.getElementById("login-erro");
+      erroEl.hidden = true;
+
+      const operador = autenticar(email, senha);
+      if (!operador) {
+        erroEl.textContent = "E-mail ou senha incorretos.";
+        erroEl.hidden = false;
+        return;
+      }
+
+      iniciarSessao(operador, lembrar);
+      window.location.href = "index.html";
+    });
+  </script>
+</body>
+</html>

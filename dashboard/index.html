@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DABF — Dashboard</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <!-- Guarda de acesso: se não tiver sessão, manda pro login ANTES de
+       renderizar qualquer coisa do dashboard. Ver js/auth.js. -->
+  <script src="js/auth.js"></script>
+  <script>exigirSessao();</script>
+</head>
+<body>
+  <!-- Carregamento e erro de conexão com a API — Alan -->
+  <div class="loading-overlay" id="loading-overlay">
+    <div class="loading-spinner"></div>
+    <p>Carregando dados do estacionamento...</p>
+  </div>
+
+  <div class="app">
+
+    <!-- ============================================================
+         SIDEBAR — Daniel (estrutura/menu lateral)
+         Só ajustar rótulos/rotas; não mexer no restante do layout
+         sem combinar, pra não conflitar com o resto da página.
+         ============================================================ -->
+    <aside class="sidebar">
+      <div class="sidebar__brand">
+        <img
+          src="../assets/LOGO DABF-REMOV.png"
+          alt="DABF"
+          class="sidebar__brand-mark-img"
+        >
+      </div>
+
+      <nav>
+        <ul class="sidebar__nav" id="sidebar-nav">
+          <!-- preenchido por js/main.js (usa ICONS de js/icons.js) -->
+        </ul>
+      </nav>
+
+      <p class="sidebar__foot">DABF<br />Sistema de Estacionamento<br />v1.0.0</p>
+    </aside>
+
+    <main class="main">
+
+      <!-- ==========================================================
+           TOPBAR — Daniel
+           ========================================================== -->
+      <header class="topbar">
+        <div>
+          <h1>Dashboard DABF</h1>
+          <p class="topbar__subtitle">Monitoramento em tempo real</p>
+        </div>
+        <div class="topbar__meta">
+          <div class="topbar__datetime">
+            <span id="calendar-icon"></span>
+            <span>
+              <span class="topbar__date" id="today"></span>
+              <span class="topbar__clock" id="clock">--:--:--</span>
+            </span>
+          </div>
+          <div class="topbar__operator-wrap">
+            <button type="button" class="topbar__operator" id="operator-toggle">
+              <div class="topbar__operator-avatar" id="user-icon"></div>
+              <span>
+                <span class="topbar__operator-name" id="topbar-operator-name">Operador</span>
+                <span class="topbar__operator-role" id="topbar-operator-role">Funcionário</span>
+              </span>
+              <span class="topbar__chevron" id="chevron-icon"></span>
+            </button>
+            <div class="operator-menu" id="operator-menu">
+              <a href="#" id="menu-perfil">Meu perfil</a>
+              <a href="#" id="menu-config">Configurações</a>
+              <a href="#" id="operator-logout">Sair</a>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Banner de erro de conexão com a API real — Alan -->
+      <div class="erro-conexao" id="erro-conexao" hidden>
+        <span id="erro-conexao-texto"></span>
+        <div class="erro-conexao__acoes">
+          <button type="button" class="btn-secondary" id="btn-tentar-novamente">Tentar novamente</button>
+        </div>
+      </div>
+
+      <!-- ==========================================================
+           CARDS DE INDICADORES — Daniel
+           Valores hoje vêm de mock-data.js; trocar por
+           GET /api/dashboard/resumo quando a rota estiver pronta.
+           ========================================================== -->
+      <section class="stat-grid" id="stat-grid" aria-label="Indicadores gerais">
+        <!-- preenchido por js/indicadores.js -->
+      </section>
+
+      <div class="content-grid" id="content-grid">
+
+        <!-- ========================================================
+             COLUNA ESQUERDA
+             ======================================================== -->
+        <div class="col" id="col-left">
+
+          <!-- MAPA DE VAGAS — Alan -->
+          <section class="panel" id="panel-mapa" aria-labelledby="mapa-title">
+            <div class="panel__head">
+              <div class="panel__title-group">
+                <span id="mapa-icon"></span>
+                <h2 class="panel__title" id="mapa-title">Mapa do Estacionamento</h2>
+              </div>
+              <div class="legend">
+                <span class="legend__item"><span class="dot dot--livre"></span>Livre</span>
+                <span class="legend__item"><span class="dot dot--ocupada"></span>Ocupada</span>
+              </div>
+            </div>
+            <div class="vaga-selector-row">
+              <select class="panel__select" id="vaga-selector">
+                <option value="">Ir para uma vaga...</option>
+              </select>
+            </div>
+            <div id="parking-map">
+              <!-- preenchido por js/mapa-vagas.js -->
+            </div>
+          </section>
+
+          <!-- LISTA COMPLETA DE VAGAS (view "Vagas") — Alan -->
+          <section class="panel" id="panel-vagas-lista" aria-labelledby="vagas-lista-title" hidden>
+            <div class="panel__head">
+              <div class="panel__title-group">
+                <span id="vagas-lista-icon"></span>
+                <h2 class="panel__title" id="vagas-lista-title">Todas as vagas</h2>
+              </div>
+              <div style="display:flex; gap:8px;">
+                <button type="button" class="btn-primary" id="btn-nova-vaga">+ Nova vaga</button>
+                <button type="button" class="btn-secondary" id="btn-gerar-lote">Gerar em lote</button>
+              </div>
+            </div>
+            <div class="filter-chips" id="vagas-filtros">
+              <button type="button" class="filter-chip is-active" data-status="todas">Todas</button>
+              <button type="button" class="filter-chip" data-status="livre">Livres</button>
+              <button type="button" class="filter-chip" data-status="ocupada">Ocupadas</button>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Vaga</th>
+                    <th>Bloco</th>
+                    <th>Placa</th>
+                    <th>Status</th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="vagas-lista-body"></tbody>
+              </table>
+            </div>
+          </section>
+
+          <!-- TABELA DE ENTRADAS RECENTES — Alan -->
+          <section class="panel" id="panel-entradas" aria-labelledby="entradas-title">
+            <div class="panel__head">
+              <div class="panel__title-group">
+                <span id="entradas-icon"></span>
+                <h2 class="panel__title" id="entradas-title">Entradas recentes</h2>
+              </div>
+              <a href="#" class="panel__link" id="ver-todas-link">Ver todas <span id="ver-todas-icon"></span></a>
+            </div>
+            <input
+              type="text"
+              id="entradas-busca"
+              class="search-input"
+              placeholder="Buscar por placa ou vaga..."
+            >
+            <div class="filter-chips" id="entradas-filtros">
+              <button type="button" class="filter-chip is-active" data-status="todas">Todas</button>
+              <button type="button" class="filter-chip" data-status="dentro">Ocupado</button>
+              <button type="button" class="filter-chip" data-status="saiu">Livre</button>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Placa</th>
+                    <th>Vaga</th>
+                    <th>Entrada</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="entradas-body">
+                  <!-- preenchido por js/entradas.js -->
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <!-- LISTA DE VEÍCULOS E MOVIMENTAÇÕES — Alan -->
+          <section class="panel" id="panel-veiculos" aria-labelledby="veiculos-title" hidden>
+            <div class="panel__head">
+              <div class="panel__title-group">
+                <span id="veiculos-icon"></span>
+                <h2 class="panel__title" id="veiculos-title">Veículos e movimentações</h2>
+              </div>
+              <span class="panel__hint">Histórico agregado por placa</span>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Placa</th>
+                    <th>Vezes</th>
+                    <th>Última vaga</th>
+                    <th>Última entrada</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="veiculos-body"></tbody>
+              </table>
+            </div>
+          </section>
+
+          <!-- PAGAMENTOS (view "Pagamentos") — Alan -->
+          <section class="panel" id="panel-pagamentos" aria-labelledby="pagamentos-title" hidden>
+            <div class="panel__head">
+              <div class="panel__title-group">
+                <span id="pagamentos-icon"></span>
+                <h2 class="panel__title" id="pagamentos-title">Pagamentos</h2>
+              </div>
+              <span class="panel__hint">Visão do operador — módulo completo é do Breno/Gomes</span>
+            </div>
+            <div class="mini-stat-grid" id="pagamentos-resumo"></div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Placa</th>
+                    <th>Vaga</th>
+                    <th>Valor</th>
+                    <th>Método</th>
+                    <th>Horário</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="pagamentos-body"></tbody>
+              </table>
+            </div>
+          </section>
+
+        </div>
+
+        <!-- ========================================================
+             COLUNA DIREITA
+             ======================================================== -->
+        <div class="col" id="col-right">
+
+          <!-- RESUMO DO RELATÓRIO (view "Relatórios") — Daniel -->
+          <section class="panel" id="panel-relatorio-resumo" aria-labelledby="relatorio-title" hidden>
+            <div class="panel__head">
+              <div class="panel__title-group">
+                <span id="relatorio-icon"></span>
+                <h2 class="panel__title" id="relatorio-title">Resumo do dia</h2>
+              </div>
+            </div>
+            <div class="mini-stat-grid" id="relatorio-resumo"></div>
+          </section>
+
+          <!-- FATURAMENTO / GRÁFICO — Daniel -->
+          <section class="panel" id="panel-faturamento" aria-labelledby="fat-title">
+            <div class="panel__head">
+              <div class="panel__title-group">
+                <span id="chart-icon"></span>
+                <h2 class="panel__title" id="fat-title">Faturamento</h2>
+              </div>
+              <select class="panel__select" id="periodo-select">
+                <option value="hoje">Hoje</option>
+                <option value="7dias">7 dias</option>
+                <option value="30dias">30 dias</option>
+              </select>
+            </div>
+            <div id="revenue-chart">
+              <!-- preenchido por js/grafico.js -->
+            </div>
+          </section>
+
+          <!-- PAINEL DE AUTOMAÇÃO — Alan -->
+          <section class="panel" id="panel-automacao" aria-labelledby="auto-title">
+            <div class="panel__head">
+              <div class="panel__title-group">
+                <span id="auto-icon"></span>
+                <h2 class="panel__title" id="auto-title">Tecnologia e Automação</h2>
+              </div>
+            </div>
+            <div class="automation-list" id="automation-list">
+              <!-- preenchido por js/automacao.js -->
+            </div>
+            <p class="automation-foot">DABF — Tecnologia que mantém você em movimento</p>
+          </section>
+
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Dados simulados — trocar por chamadas reais à API quando as rotas
+       do Gomes estiverem prontas (/api/vagas, /api/dashboard/resumo,
+       /api/movimentacoes/recentes). Ver mock-data.js. -->
+  <script src="js/icons.js"></script>
+  <script src="js/mock-data.js"></script>
+  <script src="js/indicadores.js"></script>
+  <script src="js/mapa-vagas.js"></script>
+  <script src="js/vagas-lista.js"></script>
+  <script src="js/vaga-form.js"></script>
+  <script src="js/vagas-lote.js"></script>
+  <script src="js/entradas.js"></script>
+  <script src="js/veiculos.js"></script>
+  <script src="js/carregamento.js"></script>
+  <script src="js/operador.js"></script>
+  <script src="js/pagamentos.js"></script>
+  <script src="js/relatorios.js"></script>
+  <script src="js/automacao.js"></script>
+  <script src="js/grafico.js"></script>
+  <script src="js/modal.js"></script>
+  <script src="js/simulacao.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

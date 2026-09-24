@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DABF — Criar conta</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/auth.css" />
+</head>
+<body>
+  <div class="authv2">
+    <!-- Marca, headline, recursos e rodapé já estão desenhados dentro
+         de assets/garagem-bg.jpg (fundo da página, ver css/auth.css).
+         O texto abaixo fica só pra acessibilidade/leitor de tela —
+         não aparece visualmente por cima da imagem. -->
+    <div class="sr-only">
+      <p>DABF | Sistema de Estacionamento — Tecnologia que mantém você em movimento</p>
+      <h1>Junte-se à equipe DABF</h1>
+      <p>Cadastre um novo operador e tenha acesso ao painel completo de monitoramento.</p>
+      <ul>
+        <li>Operação mais segura — Monitoramento em tempo real</li>
+        <li>Controle em tempo real — Informações sempre atualizadas</li>
+        <li>Gestão mais eficiente — Tudo em um só lugar</li>
+      </ul>
+      <p>© 2026 DABF. Todos os direitos reservados. v1.0.0</p>
+    </div>
+
+    <div class="authv2__body">
+      <div class="authv2-card">
+        <div class="authv2-card__logo">
+          <img src="../assets/LOGO DABF-REMOV.png" alt="DABF">
+        </div>
+        <h2 class="authv2-card__title">Criar conta</h2>
+        <p class="authv2-card__subtitle">
+          Cadastre um novo operador e tenha acesso ao sistema DABF.
+        </p>
+
+        <div class="authv2-error" id="cadastro-erro" hidden></div>
+
+        <form id="cadastro-form">
+          <div class="authv2-field">
+            <span class="authv2-field__icon" id="icon-nome"></span>
+            <input type="text" id="cad-nome" placeholder="Nome completo" required autocomplete="name">
+          </div>
+
+          <div class="authv2-field">
+            <span class="authv2-field__icon" id="icon-email"></span>
+            <input type="email" id="cad-email" placeholder="E-mail" required autocomplete="username">
+          </div>
+
+          <div class="authv2-row-split">
+            <div class="authv2-field">
+              <span class="authv2-field__icon" id="icon-cargo"></span>
+              <input type="text" id="cad-cargo" placeholder="Cargo" required>
+            </div>
+            <div class="authv2-field">
+              <span class="authv2-field__icon" id="icon-perfil"></span>
+              <select id="cad-perfil">
+                <option value="Operador">Operador</option>
+                <option value="Administrador">Administrador</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="authv2-field authv2-field--toggle">
+            <span class="authv2-field__icon" id="icon-senha"></span>
+            <input type="password" id="cad-senha" placeholder="Senha" required autocomplete="new-password" minlength="6">
+            <button type="button" class="authv2-field__toggle" id="toggle-cad-senha" aria-label="Mostrar senha">
+              <span id="icon-olho1"></span>
+            </button>
+          </div>
+
+          <div class="authv2-field authv2-field--toggle">
+            <span class="authv2-field__icon" id="icon-senha2"></span>
+            <input type="password" id="cad-confirmar" placeholder="Confirmar senha" required autocomplete="new-password" minlength="6">
+            <button type="button" class="authv2-field__toggle" id="toggle-cad-confirmar" aria-label="Mostrar senha">
+              <span id="icon-olho2"></span>
+            </button>
+          </div>
+
+          <button type="submit" class="authv2-submit">
+            <span id="icon-userplus"></span>
+            Criar conta
+          </button>
+        </form>
+
+        <p class="authv2-footer-text" style="margin-top: 20px;">
+          Já possui conta? <a href="login.html" class="authv2-link">Entrar</a>
+        </p>
+
+        <div class="authv2-trust">
+          <span class="authv2-trust__item"><span id="trust-icon-1"></span>Conexão segura</span>
+          <span class="authv2-trust__item"><span id="trust-icon-2"></span>Sistema em tempo real</span>
+          <span class="authv2-trust__item"><span id="trust-icon-3"></span>Alta disponibilidade</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="js/icons.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    document.getElementById("icon-nome").innerHTML = ICONS.user;
+    document.getElementById("icon-email").innerHTML = ICONS.mail;
+    document.getElementById("icon-cargo").innerHTML = ICONS.briefcase;
+    document.getElementById("icon-perfil").innerHTML = ICONS.shield;
+    document.getElementById("icon-senha").innerHTML = ICONS.lock;
+    document.getElementById("icon-senha2").innerHTML = ICONS.lock;
+    document.getElementById("icon-olho1").innerHTML = ICONS.eye;
+    document.getElementById("icon-olho2").innerHTML = ICONS.eye;
+    document.getElementById("icon-userplus").innerHTML = ICONS.userPlus;
+    document.getElementById("trust-icon-1").innerHTML = ICONS.shield;
+    document.getElementById("trust-icon-2").innerHTML = ICONS.clock;
+    document.getElementById("trust-icon-3").innerHTML = ICONS.cloud;
+
+    seedOperadorPadrao();
+
+    ligarToggleSenha("toggle-cad-senha", "cad-senha");
+    ligarToggleSenha("toggle-cad-confirmar", "cad-confirmar");
+    document.getElementById("toggle-cad-senha").addEventListener("click", () => {
+      const visivel = document.getElementById("cad-senha").type === "text";
+      document.getElementById("icon-olho1").innerHTML = visivel ? ICONS.eyeOff : ICONS.eye;
+    });
+    document.getElementById("toggle-cad-confirmar").addEventListener("click", () => {
+      const visivel = document.getElementById("cad-confirmar").type === "text";
+      document.getElementById("icon-olho2").innerHTML = visivel ? ICONS.eyeOff : ICONS.eye;
+    });
+
+    if (obterSessao()) {
+      window.location.href = "index.html";
+    }
+
+    document.getElementById("cadastro-form").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const erroEl = document.getElementById("cadastro-erro");
+      erroEl.hidden = true;
+
+      const dados = {
+        nome: document.getElementById("cad-nome").value,
+        email: document.getElementById("cad-email").value,
+        cargo: document.getElementById("cad-cargo").value,
+        perfil: document.getElementById("cad-perfil").value,
+        senha: document.getElementById("cad-senha").value,
+        confirmarSenha: document.getElementById("cad-confirmar").value,
+      };
+
+      const erro = criarOperador(dados);
+      if (erro) {
+        erroEl.textContent = erro;
+        erroEl.hidden = false;
+        return;
+      }
+
+      window.location.href = "login.html?criado=1";
+    });
+  </script>
+</body>
+</html>
