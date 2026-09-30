@@ -36,7 +36,7 @@
   position: relative;
   overflow: hidden;
   background-color: #08080a;
-  background-image: url("../assets/garagem-bg.jpg");
+  background-image: url("../assets/FUNDO\ ATUALIZADO.png");
   background-size: cover;
   background-position: center;
 }
@@ -44,12 +44,14 @@
 /* Card flutuante — posicionado igual ao mockup: um pouco à direita do
    centro da tela, sobre a foto. */
 .authv2__body {
-  position: relative;
-  z-index: 2;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  padding: 24px;
+    position: relative;
+    z-index: 2;
+    width: 100%;
+
+    display: flex;
+    justify-content: flex-start;
+
+    padding: 24px 24px 24px 260px;
 }
 
 .authv2-card {
@@ -77,7 +79,7 @@
 }
 
 .authv2-card__logo img {
-  height: 60px;
+  height: 110px;
   width: auto;
 }
 
