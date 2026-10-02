@@ -1,5 +1,8 @@
 from sqlite3 import Connection
 
+# Repositórios não fazem commit: quem chama controla a transação
+# (ver database.connection.transacao).
+
 
 def criar(conn: Connection, ticket_id: int, metodo: str, valor: float, status: str, pago_em: str) -> dict:
     cursor = conn.execute(
@@ -9,7 +12,6 @@ def criar(conn: Connection, ticket_id: int, metodo: str, valor: float, status: s
         """,
         (ticket_id, metodo, valor, status, pago_em),
     )
-    conn.commit()
     return {
         "id": cursor.lastrowid,
         "ticket_id": ticket_id,
