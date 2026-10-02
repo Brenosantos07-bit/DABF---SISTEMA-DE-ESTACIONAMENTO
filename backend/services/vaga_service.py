@@ -8,6 +8,7 @@ class SemVagaDisponivelError(Exception):
 
 
 def reservar_vaga_livre(conn: Connection) -> dict:
+    """Deve ser chamada dentro de uma transacao() — não faz commit."""
     vaga = vaga_repository.reservar_proxima_livre(conn)
     if vaga is None:
         raise SemVagaDisponivelError("Nenhuma vaga livre no momento.")

@@ -69,6 +69,66 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_um_ticket_ativo_por_veiculo
 
 CREATE UNIQUE INDEX IF NOT EXISTS idx_uma_vaga_por_ticket_ativo
     ON tickets(vaga_id) WHERE status IN ('ABERTO', 'PAGO');
+
+-- ------------------------------------------------------------------
+-- Regras de consistência de estados (triggers)
+-- O banco recusa qualquer combinação incoerente entre ticket e vaga,
+-- mesmo que algum código esqueça de validar.
+-- ------------------------------------------------------------------
+
+-- Ticket sempre nasce ABERTO e numa vaga que acabou de ser RESERVADA.
+CREATE TRIGGER IF NOT EXISTS trg_ticket_nasce_aberto_em_vaga_reservada
+BEFORE INSERT ON tickets
+BEGIN
+    SELECT RAISE(ABORT, 'Ticket novo deve ter status ABERTO')
+    WHERE NEW.status <> 'ABERTO';
+
+    SELECT RAISE(ABORT, 'Ticket novo exige vaga com status RESERVADA')
+    WHERE (SELECT status FROM vagas WHERE id = NEW.vaga_id) IS NOT 'RESERVADA';
+END;
+
+-- Ciclo de vida do ticket: ABERTO -> PAGO -> FINALIZADO (sem pular, sem voltar).
+CREATE TRIGGER IF NOT EXISTS trg_ticket_transicao_valida
+BEFORE UPDATE OF status ON tickets
+WHEN NEW.status <> OLD.status
+BEGIN
+    SELECT RAISE(ABORT, 'Transicao de status do ticket invalida')
+    WHERE NOT (
+        (OLD.status = 'ABERTO' AND NEW.status = 'PAGO') OR
+        (OLD.status = 'PAGO'   AND NEW.status = 'FINALIZADO')
+    );
+
+    SELECT RAISE(ABORT, 'Ticket so pode ficar PAGO com um pagamento APROVADO registrado')
+    WHERE NEW.status = 'PAGO'
+      AND NOT EXISTS (
+          SELECT 1 FROM pagamentos
+          WHERE ticket_id = NEW.id AND status = 'APROVADO'
+      );
+END;
+
+-- Ao finalizar o ticket (saída), a vaga é liberada automaticamente
+-- e o horário de saída é preenchido se ninguém informou
+-- (mesmo formato ISO do campo entrada: 2026-10-01T14:30:00).
+CREATE TRIGGER IF NOT EXISTS trg_ticket_finalizado_libera_vaga
+AFTER UPDATE OF status ON tickets
+WHEN NEW.status = 'FINALIZADO' AND OLD.status <> 'FINALIZADO'
+BEGIN
+    UPDATE vagas SET status = 'LIVRE' WHERE id = NEW.vaga_id;
+    UPDATE tickets SET saida = strftime('%Y-%m-%dT%H:%M:%S', 'now', 'localtime')
+    WHERE id = NEW.id AND saida IS NULL;
+END;
+
+-- Vaga com ticket ativo (ABERTO/PAGO) não pode voltar a ficar LIVRE.
+CREATE TRIGGER IF NOT EXISTS trg_vaga_com_ticket_ativo_nao_libera
+BEFORE UPDATE OF status ON vagas
+WHEN NEW.status = 'LIVRE' AND OLD.status <> 'LIVRE'
+BEGIN
+    SELECT RAISE(ABORT, 'Vaga possui ticket ativo e nao pode ser liberada')
+    WHERE EXISTS (
+        SELECT 1 FROM tickets
+        WHERE vaga_id = NEW.id AND status IN ('ABERTO', 'PAGO')
+    );
+END;
 """
 
 SEED_VAGAS = [f"A{str(i).zfill(2)}" for i in range(1, 11)] + [f"C{str(i).zfill(2)}" for i in range(1, 11)]

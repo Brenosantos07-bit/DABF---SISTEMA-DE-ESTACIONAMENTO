@@ -1,6 +1,9 @@
 from sqlite3 import Connection
 from typing import Optional
 
+# Repositórios não fazem commit: quem chama controla a transação
+# (ver database.connection.transacao).
+
 
 def buscar_livre(conn: Connection) -> Optional[dict]:
     row = conn.execute(
@@ -8,22 +11,27 @@ def buscar_livre(conn: Connection) -> Optional[dict]:
     ).fetchone()
     return dict(row) if row else None
 
+
 def reservar_proxima_livre(conn: Connection) -> Optional[dict]:
-    vaga = buscar_livre(conn)
-    if vaga is None:
-        return None
+    """
+    Reserva a primeira vaga LIVRE. Retorna None se o estacionamento estiver lotado.
 
-    cursor = conn.execute(
-        "UPDATE vagas SET status = 'RESERVADA' WHERE id = ? AND status = 'LIVRE'",
-        (vaga["id"],),
-    )
-    conn.commit()
+    O UPDATE só altera se a vaga ainda estiver LIVRE (condição atômica).
+    Dentro de transacao() (BEGIN IMMEDIATE) não há concorrência; o laço
+    é só uma proteção extra caso a função seja chamada fora dela.
+    """
+    while True:
+        vaga = buscar_livre(conn)
+        if vaga is None:
+            return None
 
-    if cursor.rowcount == 0:
-        return reservar_proxima_livre(conn)
-
-    vaga["status"] = "RESERVADA"
-    return vaga
+        cursor = conn.execute(
+            "UPDATE vagas SET status = 'RESERVADA' WHERE id = ? AND status = 'LIVRE'",
+            (vaga["id"],),
+        )
+        if cursor.rowcount == 1:
+            vaga["status"] = "RESERVADA"
+            return vaga
 
 
 def buscar_por_id(conn: Connection, vaga_id: int) -> Optional[dict]:
@@ -33,7 +41,6 @@ def buscar_por_id(conn: Connection, vaga_id: int) -> Optional[dict]:
 
 def atualizar_status(conn: Connection, vaga_id: int, status: str) -> None:
     conn.execute("UPDATE vagas SET status = ? WHERE id = ?", (status, vaga_id))
-    conn.commit()
 
 
 def listar_todas(conn: Connection) -> list[dict]:

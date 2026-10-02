@@ -3,10 +3,20 @@ from datetime import datetime
 from sqlite3 import Connection
 from typing import Optional
 
-from repositories import veiculo_repository, ticket_repository, vaga_repository
+from database.connection import transacao
+from repositories import (
+    veiculo_repository,
+    ticket_repository,
+    vaga_repository,
+    movimentacao_repository,
+)
 from services.vaga_service import reservar_vaga_livre
 
 VALOR_HORA = 11.00  # valor simples e fixo para a versão acadêmica
+
+
+class VeiculoComTicketAtivoError(Exception):
+    """Levantado quando a placa já tem um ticket ABERTO ou PAGO (carro já está dentro)."""
 
 
 def _gerar_token() -> str:
@@ -17,29 +27,39 @@ def registrar_entrada(conn: Connection, placa: str) -> dict:
     """
     Fluxo completo da entrada (seção 8.1 do guia):
     1. localizar/cadastrar veículo
-    2. reservar vaga livre
-    3. criar ticket ABERTO com token único
-    4. registrar movimentação ENTRADA/RESERVA
+    2. recusar se o veículo já tiver ticket ativo
+    3. reservar vaga livre
+    4. criar ticket ABERTO com token único
+    5. registrar movimentações ENTRADA e RESERVA
+
+    Tudo numa única transação: se qualquer passo falhar, nada é gravado
+    (nenhuma vaga fica presa como RESERVADA sem ticket).
+
+    Erros possíveis:
+        VeiculoComTicketAtivoError -> rota deve devolver 409
+        SemVagaDisponivelError     -> rota deve devolver 409
     """
-    veiculo = veiculo_repository.buscar_ou_criar(conn, placa)
-    vaga = reservar_vaga_livre(conn)  # levanta SemVagaDisponivelError se lotado
+    with transacao(conn):
+        veiculo = veiculo_repository.buscar_ou_criar(conn, placa)
 
-    entrada_datetime = datetime.now().isoformat(timespec="seconds")
-    token = _gerar_token()
+        if ticket_repository.buscar_ativo_por_veiculo(conn, veiculo["id"]) is not None:
+            raise VeiculoComTicketAtivoError(f"O veículo {placa} já está no estacionamento.")
 
-    ticket = ticket_repository.criar(
-        conn,
-        token=token,
-        veiculo_id=veiculo["id"],
-        vaga_id=vaga["id"],
-        entrada=entrada_datetime,
-    )
+        vaga = reservar_vaga_livre(conn)  # levanta SemVagaDisponivelError se lotado
 
-    conn.execute(
-        "INSERT INTO movimentacoes (ticket_id, tipo) VALUES (?, 'ENTRADA')",
-        (ticket["id"],),
-    )
-    conn.commit()
+        entrada_datetime = datetime.now().isoformat(timespec="seconds")
+        token = _gerar_token()
+
+        ticket = ticket_repository.criar(
+            conn,
+            token=token,
+            veiculo_id=veiculo["id"],
+            vaga_id=vaga["id"],
+            entrada=entrada_datetime,
+        )
+
+        movimentacao_repository.registrar(conn, ticket["id"], "ENTRADA")
+        movimentacao_repository.registrar(conn, ticket["id"], "RESERVA")
 
     return {
         "ticket": ticket["numero"],
@@ -56,9 +76,7 @@ def buscar_ticket_por_token(conn: Connection, token: str) -> Optional[dict]:
     if ticket is None:
         return None
 
-    veiculo = conn.execute(
-        "SELECT placa FROM veiculos WHERE id = ?", (ticket["veiculo_id"],)
-    ).fetchone()
+    veiculo = veiculo_repository.buscar_por_id(conn, ticket["veiculo_id"])
     vaga = vaga_repository.buscar_por_id(conn, ticket["vaga_id"])
 
     entrada_dt = datetime.fromisoformat(ticket["entrada"])
