@@ -52,6 +52,15 @@ def buscar_ativo_por_veiculo(conn: Connection, veiculo_id: int) -> Optional[dict
     return dict(row) if row else None
 
 
+def buscar_ativo_por_vaga(conn: Connection, vaga_id: int) -> Optional[dict]:
+    """Ticket ABERTO ou PAGO atualmente ocupando essa vaga (no máximo um)."""
+    row = conn.execute(
+        "SELECT * FROM tickets WHERE vaga_id = ? AND status IN ('ABERTO', 'PAGO')",
+        (vaga_id,),
+    ).fetchone()
+    return dict(row) if row else None
+
+
 def buscar_aberto_por_placa(conn: Connection, placa: str) -> Optional[dict]:
     row = conn.execute(
         """

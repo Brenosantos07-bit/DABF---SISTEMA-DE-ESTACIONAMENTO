@@ -23,6 +23,19 @@ def _gerar_token() -> str:
     return secrets.token_hex(5)  # 10 caracteres, ex: a7f93b81x2
 
 
+def calcular_tempo_e_valor(entrada_iso: str) -> tuple[int, float]:
+    """
+    Tempo decorrido (segundos) e valor a cobrar a partir do horário de entrada.
+    Hora iniciada conta inteira (mínimo 1h), igual tarifa de estacionamento real.
+    Usado tanto na consulta do ticket (GET) quanto no pagamento (POST).
+    """
+    entrada_dt = datetime.fromisoformat(entrada_iso)
+    tempo_segundos = int((datetime.now() - entrada_dt).total_seconds())
+    horas = max(1, -(-tempo_segundos // 3600))  # arredonda pra cima
+    valor = round(horas * VALOR_HORA, 2)
+    return tempo_segundos, valor
+
+
 def registrar_entrada(conn: Connection, placa: str) -> dict:
     """
     Fluxo completo da entrada (seção 8.1 do guia):
@@ -79,10 +92,7 @@ def buscar_ticket_por_token(conn: Connection, token: str) -> Optional[dict]:
     veiculo = veiculo_repository.buscar_por_id(conn, ticket["veiculo_id"])
     vaga = vaga_repository.buscar_por_id(conn, ticket["vaga_id"])
 
-    entrada_dt = datetime.fromisoformat(ticket["entrada"])
-    tempo_segundos = int((datetime.now() - entrada_dt).total_seconds())
-    horas = max(1, -(-tempo_segundos // 3600))  # arredonda pra cima, mínimo 1h
-    valor = round(horas * VALOR_HORA, 2)
+    tempo_segundos, valor = calcular_tempo_e_valor(ticket["entrada"])
 
     return {
         "numero": ticket["numero"],
