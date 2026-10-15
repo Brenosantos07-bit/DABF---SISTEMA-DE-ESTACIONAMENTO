@@ -1547,3 +1547,20 @@ tbody tr:hover td {
     transform: none !important;
   }
 }
+
+/* ==============================
+   Modo API real (dados vindos do backend)
+   O CRUD de vagas ainda não tem rota no backend: esconde os botões
+   para não editar dados que seriam desfeitos na próxima atualização.
+============================== */
+
+.selo-exemplo {
+  margin-left: 8px;
+  white-space: nowrap;
+}
+
+.modo-api-real #btn-nova-vaga,
+.modo-api-real #btn-gerar-lote,
+.modo-api-real .row-actions {
+  display: none;
+}

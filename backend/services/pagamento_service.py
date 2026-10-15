@@ -5,9 +5,6 @@ from database.connection import transacao
 from repositories import movimentacao_repository, pagamento_repository, ticket_repository
 from services.ticket_service import calcular_tempo_e_valor
 
-METODOS_VALIDOS = ("PIX", "CARTAO", "DINHEIRO")
-
-
 class TicketNaoEncontradoError(Exception):
     """Token não corresponde a nenhum ticket."""
 
@@ -35,19 +32,23 @@ def pagar_ticket(conn: Connection, token: str, metodo: str) -> dict:
         TicketNaoEncontradoError -> rota deve devolver 404
         TicketJaPagoError        -> rota deve devolver 409
     """
-    ticket = ticket_repository.buscar_por_token(conn, token)
-    if ticket is None:
-        raise TicketNaoEncontradoError(f"Ticket com token {token} não encontrado.")
-
-    if ticket["status"] != "ABERTO":
-        raise TicketJaPagoError(
-            f"Ticket {ticket['numero']} está {ticket['status']}, não pode ser pago novamente."
-        )
-
-    _, valor = calcular_tempo_e_valor(ticket["entrada"])
-    pago_em = datetime.now().isoformat(timespec="seconds")
-
+    # A leitura do ticket e a gravação ficam na MESMA transação
+    # (BEGIN IMMEDIATE): se o motorista clicar duas vezes em "pagar",
+    # o segundo pedido espera o primeiro terminar, já encontra o ticket
+    # PAGO e recebe TicketJaPagoError — nunca há cobrança em dobro.
     with transacao(conn):
+        ticket = ticket_repository.buscar_por_token(conn, token)
+        if ticket is None:
+            raise TicketNaoEncontradoError(f"Ticket com token {token} não encontrado.")
+
+        if ticket["status"] != "ABERTO":
+            raise TicketJaPagoError(
+                f"Ticket {ticket['numero']} está {ticket['status']}, não pode ser pago novamente."
+            )
+
+        _, valor = calcular_tempo_e_valor(ticket["entrada"])
+        pago_em = datetime.now().isoformat(timespec="seconds")
+
         pagamento = pagamento_repository.criar(
             conn,
             ticket_id=ticket["id"],

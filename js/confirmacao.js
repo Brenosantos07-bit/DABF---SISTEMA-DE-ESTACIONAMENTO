@@ -1,3 +1,11 @@
+/**
+ * confirmacao.js — Saída liberada (Breno)
+ *
+ * confirmacao.html?id=TOKEN&forma=PIX
+ * Mostra o comprovante com os dados reais do ticket já pago
+ * (GET /api/tickets/{token}). Sem servidor, usa dados de exemplo.
+ */
+
 const parametros =
     new URLSearchParams(window.location.search);
 
@@ -10,55 +18,72 @@ const formaPagamento =
     parametros.get("forma");
 
 
-console.log(
-    "Ticket:",
-    idTicket
-);
+function preencherComprovante(ticket) {
+
+    document.getElementById("placa").textContent =
+        DABF_API.formatarPlaca(ticket.placa);
 
 
-console.log(
-    "Pagamento:",
-    formaPagamento
-);
-
-const ticket = {
-
-    codigo: "000541",
-
-    placa: "QKP-8166",
-
-    vaga: "C-12",
-
-    valor: 11.00
-
-};
-
-document.getElementById("placa").textContent =
-    ticket.placa;
+    document.getElementById("vaga").textContent =
+        ticket.vaga;
 
 
-document.getElementById("vaga").textContent =
-    ticket.vaga;
+    document.getElementById("numeroTicket").textContent =
+        ticket.numero;
 
 
-document.getElementById("numeroTicket").textContent =
-    ticket.codigo;
+    document.getElementById("formaPagamento").textContent =
+        DABF_API.nomeMetodo(formaPagamento || "PIX");
 
 
-document.getElementById("formaPagamento").textContent =
-    formaPagamento || "PIX";
+    document.getElementById("valorPago").textContent =
+        DABF_API.formatarMoeda(ticket.valor);
+
+}
 
 
-document.getElementById("valorPago").textContent =
-    ticket.valor.toLocaleString(
-        "pt-BR",
-        {
-            style: "currency",
-            currency: "BRL"
+async function carregarComprovante() {
+
+    try {
+
+        const ticket =
+            await DABF_API.buscarTicket(idTicket || "");
+
+
+        // Ainda não pago: volta para a tela de pagamento.
+        if (ticket.status === "ABERTO") {
+
+            window.location.href =
+                DABF_API.link("pagamento.html", { id: idTicket });
+
+            return;
+
         }
-    );
 
-    const botaoFinalizar =
+
+        preencherComprovante(ticket);
+
+    } catch (erro) {
+
+        if (erro.status === 404) {
+
+            alert("Ticket não encontrado.");
+
+            return;
+
+        }
+
+
+        DABF_API.mostrarAvisoDemonstracao();
+
+        preencherComprovante(DABF_API.ticketDemonstracao());
+
+    }
+
+}
+
+
+const botaoFinalizar =
     document.getElementById("finalizar");
 
 
@@ -70,5 +95,12 @@ botaoFinalizar.addEventListener(
             "Pagamento concluído. Dirija-se à saída."
         );
 
+
+        window.location.href =
+            DABF_API.link("ticket.html", { id: idTicket || "" });
+
     }
 );
+
+
+carregarComprovante();

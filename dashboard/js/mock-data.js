@@ -82,22 +82,22 @@ const MOCK_VAGAS = [
 ];
 
 const MOCK_ENTRADAS = [
-  { placa: "QKP-8I66", vaga: "B-02", entrada: "08:45:23", status: "dentro" },
-  { placa: "ABC-1D23", vaga: "A-03", entrada: "09:12:17", status: "dentro" },
-  { placa: "XYZ-9F87", vaga: "A-05", entrada: "09:29:41", status: "dentro" },
-  { placa: "ETV-4H55", vaga: "A-07", entrada: "09:35:02", status: "dentro" },
-  { placa: "MN8-2C11", vaga: "A-10", entrada: "10:01:15", status: "dentro" },
+  { placa: "QKP-8I66", vaga: "B02", entrada: "08:45:23", status: "dentro" },
+  { placa: "ABC-1D23", vaga: "A03", entrada: "09:12:17", status: "dentro" },
+  { placa: "XYZ-9F87", vaga: "A05", entrada: "09:29:41", status: "dentro" },
+  { placa: "ETV-4H55", vaga: "A07", entrada: "09:35:02", status: "dentro" },
+  { placa: "MN8-2C11", vaga: "A10", entrada: "10:01:15", status: "dentro" },
 ];
 
 // Histórico maior, usado quando clica em "Ver todas".
 const MOCK_ENTRADAS_ALL = [
   ...MOCK_ENTRADAS,
-  { placa: "JCV-5R41", vaga: "B-03", entrada: "10:20:09", status: "dentro" },
-  { placa: "RTQ-3T88", vaga: "B-06", entrada: "10:33:47", status: "dentro" },
-  { placa: "LMB-7Y02", vaga: "B-09", entrada: "10:41:12", status: "dentro" },
-  { placa: "HXP-2C90", vaga: "A-02", entrada: "07:58:04", status: "saiu" },
-  { placa: "GKT-9L14", vaga: "B-05", entrada: "07:40:51", status: "saiu" },
-  { placa: "WBN-4F76", vaga: "A-09", entrada: "07:22:38", status: "saiu" },
+  { placa: "JCV-5R41", vaga: "B03", entrada: "10:20:09", status: "dentro" },
+  { placa: "RTQ-3T88", vaga: "B06", entrada: "10:33:47", status: "dentro" },
+  { placa: "LMB-7Y02", vaga: "B09", entrada: "10:41:12", status: "dentro" },
+  { placa: "HXP-2C90", vaga: "A02", entrada: "07:58:04", status: "saiu" },
+  { placa: "GKT-9L14", vaga: "B05", entrada: "07:40:51", status: "saiu" },
+  { placa: "WBN-4F76", vaga: "A09", entrada: "07:22:38", status: "saiu" },
 ];
 
 const MOCK_AUTOMACAO = [
@@ -176,12 +176,12 @@ const MOCK_PLACAS_DISPONIVEIS = [
 // Breno/Gomes no front do motorista); aqui é só uma visão do operador
 // pro dashboard, combinar com o grupo antes de virar rota de verdade.
 const MOCK_PAGAMENTOS = [
-  { placa: "QKP-8I66", vaga: "B-02", valor: 11.0, metodo: "Pix", horario: "08:45:23", status: "pendente" },
-  { placa: "ABC-1D23", vaga: "A-03", valor: 8.5, metodo: "Cartão", horario: "09:12:17", status: "pendente" },
-  { placa: "HXP-2C90", vaga: "A-02", valor: 14.0, metodo: "Pix", horario: "07:58:04", status: "pago" },
-  { placa: "GKT-9L14", vaga: "B-05", valor: 6.0, metodo: "Cartão", horario: "07:40:51", status: "pago" },
-  { placa: "WBN-4F76", vaga: "A-09", valor: 9.5, metodo: "Pix", horario: "07:22:38", status: "pago" },
-  { placa: "ETV-4H55", vaga: "A-07", valor: 7.0, metodo: "Pix", horario: "09:35:02", status: "pendente" },
+  { placa: "QKP-8I66", vaga: "B02", valor: 11.0, metodo: "Pix", horario: "08:45:23", status: "pendente" },
+  { placa: "ABC-1D23", vaga: "A03", valor: 8.5, metodo: "Cartão", horario: "09:12:17", status: "pendente" },
+  { placa: "HXP-2C90", vaga: "A02", valor: 14.0, metodo: "Pix", horario: "07:58:04", status: "pago" },
+  { placa: "GKT-9L14", vaga: "B05", valor: 6.0, metodo: "Cartão", horario: "07:40:51", status: "pago" },
+  { placa: "WBN-4F76", vaga: "A09", valor: 9.5, metodo: "Pix", horario: "07:22:38", status: "pago" },
+  { placa: "ETV-4H55", vaga: "A07", valor: 7.0, metodo: "Pix", horario: "09:35:02", status: "pendente" },
 ];
 
 // Indicadores usados na view "Relatórios" do menu lateral — resumo do

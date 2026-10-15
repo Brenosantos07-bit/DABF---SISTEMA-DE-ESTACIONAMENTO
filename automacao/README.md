@@ -35,7 +35,7 @@ automacao/
 O módulo utiliza bibliotecas padrão do Python para requisições HTTP e manipulação da CLI. Para a renderização visual do QR Code no terminal, é utilizada a biblioteca `qrcode`:
 
 ```bash
-pip install qrcode
+pip install -r automacao/requirements.txt
 ```
 
 ---
@@ -79,7 +79,7 @@ Simula o sensor de presença de vaga. Requer o ID numérico inteiro positivo da 
 # Simular veículo estacionando (marca como OCUPADA)
 python -m automacao.simulador ocupar 1 --ocupada
 
-# Simular veículo saindo da vaga (marca como LIVRE)
+# Simular veículo saindo da vaga (volta para RESERVADA; só fica LIVRE na saída pela cancela)
 python -m automacao.simulador ocupar 1 --livre
 ```
 
@@ -115,7 +115,7 @@ python -m automacao.simulador confirmar-saida QKP-8166 --passagem-confirmada
 O endpoint de entrada (`POST /api/entrada`) retorna o código textual da vaga (ex: `A01`), enquanto a rota de ocupação (`POST /api/vagas/{vaga_id}/ocupacao`) exige a chave primária numérica (`vaga_id` inteiro).
 
 ### Solução Atual
-O comando CLI `ocupar` aceita diretamente o identificador numérico `vaga_id` fornecido pelo operador para permitir os testes do endpoint.
+O comando CLI `ocupar` usa o identificador numérico `vaga_id`. Para descobrir o ID de cada vaga, rode `python -m automacao.simulador vagas` (a rota `GET /api/vagas` devolve o campo `id`). Se o sensor detectar carro numa vaga sem ticket, a API não altera a vaga e devolve um `alerta`.
 
 ### Proposta de Alinhamento
 Propor à equipe do backend a inclusão do campo aditivo `vaga_id` (inteiro) na resposta de `POST /api/entrada` ou o retorno da propriedade `id` no objeto de listagem em `GET /api/vagas`.

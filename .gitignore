@@ -1,0 +1,13 @@
+# Python
+__pycache__/
+*.pyc
+venv/
+.venv/
+
+# Banco de dados local (cada um gera o seu com python -m database.init_db)
+*.db
+
+# Arquivos temporários
+contexto_para_ia.txt
+.DS_Store
+Thumbs.db

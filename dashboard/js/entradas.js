@@ -12,6 +12,15 @@ const STATUS_LABEL = {
   saiu: "Livre",
 };
 
+// Evita que o texto digitado na busca seja interpretado como HTML.
+function escaparHtml(texto) {
+  return String(texto)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
 function badgeStatus(status) {
   const label = STATUS_LABEL[status] || status;
   return `<span class="badge badge--${status}">${label}</span>`;
@@ -33,7 +42,7 @@ function renderEntradas(entradas, termoBusca) {
   if (filtradas.length === 0) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="4" class="table-empty">Nenhuma entrada encontrada para "${termoBusca}".</td>
+        <td colspan="4" class="table-empty">Nenhuma entrada encontrada para "${escaparHtml(termoBusca)}".</td>
       </tr>
     `;
     return;

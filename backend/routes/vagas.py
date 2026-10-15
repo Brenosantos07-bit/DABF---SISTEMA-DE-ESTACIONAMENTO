@@ -19,7 +19,11 @@ def listar_vagas():
         conn.close()
 
 
-@router.post("/api/vagas/{vaga_id}/ocupacao", response_model=OcupacaoResponse)
+@router.post(
+    "/api/vagas/{vaga_id}/ocupacao",
+    response_model=OcupacaoResponse,
+    response_model_exclude_none=True,
+)
 def atualizar_ocupacao_vaga(vaga_id: int, payload: OcupacaoRequest):
     conn = get_connection()
     try:

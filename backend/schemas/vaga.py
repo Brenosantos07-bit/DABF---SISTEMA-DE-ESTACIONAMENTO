@@ -11,6 +11,7 @@ class VagaResponse(BaseModel):
     vaga está livre, no mesmo formato que o Dashboard já espera
     (ver dashboard/js/mock-data.js).
     """
+    id: int  # usado pela automação (sensor) em /api/vagas/{id}/ocupacao
     bloco: str
     codigo: str
     status: str  # "livre" / "ocupada"
@@ -24,4 +25,5 @@ class OcupacaoRequest(BaseModel):
 
 class OcupacaoResponse(BaseModel):
     vaga: str
-    status: str  # OCUPADA / RESERVADA
+    status: str  # LIVRE / RESERVADA / OCUPADA (status real da vaga depois da leitura)
+    alerta: Optional[str] = None  # preenchido quando o sensor vê carro em vaga sem ticket

@@ -19,6 +19,11 @@
     </script>
 
     <script
+        src="js/api.js"
+        defer>
+    </script>
+
+    <script
         src="js/ticket.js"
         defer>
     </script>
@@ -144,7 +149,7 @@
 
         <!-- STATUS -->
 
-        <section class="status-card">
+        <section class="status-card" id="statusCard">
 
             <div class="status-icon">
 
@@ -155,9 +160,9 @@
 
             <div class="status-content">
 
-                <strong>Ticket ativo</strong>
+                <strong id="statusTitulo">Ticket ativo</strong>
 
-                <span>
+                <span id="statusTexto">
                     Seu estacionamento está em andamento
                 </span>
 
@@ -175,7 +180,7 @@
 
             <i data-lucide="credit-card"></i>
 
-            <span>PAGAR AGORA</span>
+            <span id="pagarTexto">PAGAR AGORA</span>
 
         </button>
 

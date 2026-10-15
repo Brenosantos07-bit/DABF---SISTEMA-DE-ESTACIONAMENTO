@@ -47,16 +47,18 @@ def confirmar_saida(conn: Connection, placa: str) -> dict:
         VeiculoNaoEncontradoError -> rota deve devolver 404
         SaidaNaoAutorizadaError   -> rota deve devolver 409 (ainda não pagou)
     """
-    ticket = _ticket_ativo_por_placa(conn, placa)
-    if ticket is None:
-        raise VeiculoNaoEncontradoError(f"Nenhum ticket ativo encontrado para a placa {placa}.")
-
-    if ticket["status"] != "PAGO":
-        raise SaidaNaoAutorizadaError(
-            f"Ticket {ticket['numero']} ainda não foi pago — saída não autorizada."
-        )
-
+    # Leitura e gravação na mesma transação: duas confirmações simultâneas
+    # da mesma placa não geram duas saídas (a segunda já não acha ticket ativo).
     with transacao(conn):
+        ticket = _ticket_ativo_por_placa(conn, placa)
+        if ticket is None:
+            raise VeiculoNaoEncontradoError(f"Nenhum ticket ativo encontrado para a placa {placa}.")
+
+        if ticket["status"] != "PAGO":
+            raise SaidaNaoAutorizadaError(
+                f"Ticket {ticket['numero']} ainda não foi pago — saída não autorizada."
+            )
+
         ticket_repository.atualizar_status(conn, ticket["id"], "FINALIZADO")
         movimentacao_repository.registrar(conn, ticket["id"], "SAIDA")
 

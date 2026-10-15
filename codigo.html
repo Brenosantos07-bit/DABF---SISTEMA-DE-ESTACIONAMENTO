@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>DABF - Ticket de Estacionamento</title>
+
+    <link rel="stylesheet" href="css/codigo.css">
+
+    <!-- Gerador de QR Code (arquivo local: funciona sem internet) -->
+    <script
+        src="js/vendor/qrcode.min.js"
+        defer>
+    </script>
+
+    <script
+        src="https://unpkg.com/lucide@latest"
+        defer>
+    </script>
+
+    <script
+        src="js/api.js"
+        defer>
+    </script>
+
+    <script
+        src="js/codigo.js"
+        defer>
+    </script>
+</head>
+
+
+<body>
+
+    <main class="codigo-page">
+
+        <!-- ==============================
+             TICKET IMPRESSO
+        ============================== -->
+
+        <article class="ticket-impresso" id="ticketImpresso">
+
+            <!-- CABEÇALHO -->
+
+            <header class="ti-header">
+
+                <img
+                    src="assets/LOGO DABF-REMOV.png"
+                    alt="DABF - Sistema de Estacionamento"
+                    class="ti-logo"
+                >
+
+                <h1>TICKET DE ESTACIONAMENTO</h1>
+
+                <p>Guarde este ticket até a saída</p>
+
+            </header>
+
+
+            <!-- NÚMERO DO TICKET -->
+
+            <div class="ti-numero">
+
+                <span>Ticket Nº</span>
+
+                <strong id="numeroTicket">------</strong>
+
+            </div>
+
+
+            <!-- DADOS DA ENTRADA -->
+
+            <section class="ti-dados">
+
+                <div class="ti-item">
+
+                    <i data-lucide="car"></i>
+
+                    <div>
+                        <span>Placa</span>
+                        <strong id="placa">---</strong>
+                    </div>
+
+                </div>
+
+
+                <div class="ti-item">
+
+                    <i data-lucide="square-parking"></i>
+
+                    <div>
+                        <span>Vaga</span>
+                        <strong id="vaga">---</strong>
+                    </div>
+
+                </div>
+
+
+                <div class="ti-item">
+
+                    <i data-lucide="calendar-days"></i>
+
+                    <div>
+                        <span>Data</span>
+                        <strong id="data">---</strong>
+                    </div>
+
+                </div>
+
+
+                <div class="ti-item">
+
+                    <i data-lucide="clock-3"></i>
+
+                    <div>
+                        <span>Entrada</span>
+                        <strong id="hora">---</strong>
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- LINHA PICOTADA -->
+
+            <div class="ti-picote" aria-hidden="true"></div>
+
+
+            <!-- QR CODE -->
+
+            <section class="ti-qr">
+
+                <div class="ti-qr-moldura">
+
+                    <div id="qrcode" class="ti-qr-codigo"></div>
+
+                </div>
+
+                <strong class="ti-qr-titulo">
+                    Escaneie com a câmera do celular
+                </strong>
+
+                <span class="ti-qr-texto">
+                    Acompanhe o tempo, veja o valor e pague
+                    pelo seu ticket digital
+                </span>
+
+                <span class="ti-token">
+                    Código: <b id="token">----------</b>
+                </span>
+
+            </section>
+
+
+            <!-- RODAPÉ -->
+
+            <footer class="ti-rodape">
+
+                <div class="ti-tarifa">
+
+                    <i data-lucide="coins"></i>
+
+                    <span>
+                        <b id="tarifa">R$ 11,00</b> por hora ou fração
+                    </span>
+
+                </div>
+
+                <p>
+                    A cancela abre automaticamente na saída
+                    após a confirmação do pagamento.
+                </p>
+
+                <p class="ti-aviso">
+                    Não amasse nem molhe este ticket.
+                </p>
+
+            </footer>
+
+        </article>
+
+
+        <!-- ==============================
+             AÇÕES (não saem na impressão)
+        ============================== -->
+
+        <div class="codigo-acoes">
+
+            <button id="imprimir" class="btn-imprimir" type="button">
+
+                <i data-lucide="printer"></i>
+
+                <span>IMPRIMIR TICKET</span>
+
+            </button>
+
+            <a id="abrirDigital" class="btn-secundario" href="#">
+
+                <i data-lucide="smartphone"></i>
+
+                <span>Abrir ticket digital</span>
+
+            </a>
+
+        </div>
+
+
+        <!-- Avisos para quem está apresentando (não saem na impressão) -->
+
+        <div id="avisos" class="codigo-avisos"></div>
+
+    </main>
+
+</body>
+
+</html>

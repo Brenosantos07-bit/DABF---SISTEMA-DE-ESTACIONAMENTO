@@ -1,0 +1,2 @@
+# Dependências do simulador de automação (rodar a partir da raiz do repositório)
+qrcode>=7.4

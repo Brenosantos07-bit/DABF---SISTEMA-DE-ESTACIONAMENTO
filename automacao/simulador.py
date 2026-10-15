@@ -1,6 +1,5 @@
 import argparse
 import sys
-import qrcode
 from automacao.api_client import DabfApiClient
 
 def main():
@@ -20,8 +19,13 @@ def main():
     # Comando: ocupar VAGA_ID [--ocupada / --livre]
     parser_ocupar = subparsers.add_parser("ocupar", help="Simula o sensor de presença na vaga")
     parser_ocupar.add_argument("vaga_id", type=int, help="ID numérico da vaga")
-    parser_ocupar.add_argument("--ocupada", action="store_true", help="Marca a vaga como ocupada")
-    parser_ocupar.add_argument("--livre", dest="ocupada", action="store_false", help="Marca a vaga como livre")
+    parser_ocupar.add_argument("--ocupada", action="store_true", help="Sensor detectou carro na vaga")
+    parser_ocupar.add_argument(
+        "--livre",
+        dest="ocupada",
+        action="store_false",
+        help="Sensor não detecta mais carro na vaga (a vaga só volta a LIVRE na saída pela cancela)",
+    )
     parser_ocupar.set_defaults(ocupada=True)
 
     # Comando: verificar-saida PLACA
@@ -56,6 +60,11 @@ def main():
             print(f" Vaga atribuída (código): {res.get('vaga')}")
 
             if token:
+                try:
+                    import qrcode  # só é necessário para desenhar o QR no terminal
+                except ImportError:
+                    print("\n(Instale 'qrcode' para ver o QR Code: pip install -r automacao/requirements.txt)")
+                    return
                 print("\nQR Code do Token de Entrada:")
                 qr = qrcode.QRCode(border=1)
                 qr.add_data(token)
@@ -63,13 +72,16 @@ def main():
 
         elif args.comando == "vagas":
             res = cliente.listar_vagas()
-            print("Vagas retornadas pela API:")
-            print(res)
+            print("Vagas retornadas pela API (use o ID no comando 'ocupar'):")
+            for vaga in res:
+                ocupante = f" - {vaga['placa']} desde {vaga['entrada']}" if vaga.get("placa") else ""
+                print(f" ID {vaga.get('id', '?'):>3} | {vaga.get('codigo')} | {vaga.get('status')}{ocupante}")
 
         elif args.comando == "ocupar":
             res = cliente.atualizar_ocupacao(args.vaga_id, args.ocupada)
-            estado = "OCUPADA" if args.ocupada else "LIVRE"
-            print(f"Vaga ID {args.vaga_id} atualizada para {estado}:", res)
+            print(f"Vaga {res.get('vaga')} (ID {args.vaga_id}) agora está {res.get('status')}.")
+            if res.get("alerta"):
+                print(f"ALERTA: {res['alerta']}")
 
         elif args.comando == "verificar-saida":
             res = cliente.verificar_saida(args.placa)
