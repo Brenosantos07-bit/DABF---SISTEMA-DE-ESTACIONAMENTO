@@ -24,6 +24,15 @@ const state = {
 const simConfig = { ativa: true, intervaloMs: 6000 };
 let simulacaoIntervalId = null;
 
+// true quando os dados vêm da API real (aí a simulação fica desligada e o
+// dashboard se atualiza sozinho buscando a API de tempos em tempos).
+let usandoApiReal = false;
+let atualizacaoApiId = null;
+
+// Painéis que ainda não têm rota no backend: em modo real ficam marcados
+// como "EXEMPLO" para ninguém confundir com dados de verdade.
+const PAINEIS_SO_EXEMPLO = ["panel-pagamentos", "panel-relatorio-resumo", "panel-faturamento", "panel-automacao"];
+
 const NAV_ITEMS = [
   { label: "Visão Geral", icon: "home", view: "geral" },
   { label: "Vagas", icon: "parkingSign", view: "vagas" },
@@ -364,7 +373,7 @@ function ligarInteracoes() {
 
 function reiniciarSimulacao() {
   if (simulacaoIntervalId) clearInterval(simulacaoIntervalId);
-  if (!simConfig.ativa) return;
+  if (!simConfig.ativa || usandoApiReal) return;
 
   simulacaoIntervalId = iniciarSimulacao(
     state,
@@ -387,6 +396,76 @@ function aoMudarConfigSimulacao({ ativa, intervaloMs }) {
 
 function aoConfirmarSaida() {
   if (simulacaoIntervalId) clearInterval(simulacaoIntervalId);
+  if (atualizacaoApiId) clearInterval(atualizacaoApiId);
+}
+
+// ---------------------------------------------------------------------
+// Modo API real: atualização automática + recursos que ainda não têm rota
+// ---------------------------------------------------------------------
+
+function atualizarTelaComDados(dados) {
+  state.resumo = dados.resumo;
+  state.vagas = dados.vagas;
+  state.entradas = dados.entradas;
+
+  renderIndicadores(state.resumo);
+  renderMapaVagas(state.vagas);
+  renderListaVagas(state.vagas, state.filtroVagas);
+  atualizarEntradasNaTela();
+}
+
+function iniciarAtualizacaoApi() {
+  if (atualizacaoApiId) clearInterval(atualizacaoApiId);
+
+  atualizacaoApiId = setInterval(async () => {
+    try {
+      atualizarTelaComDados(await buscarDadosReais());
+      esconderErroConexao();
+    } catch (erro) {
+      mostrarErroConexao("Conexão com a API perdida — tentando de novo a cada 5 segundos.");
+    }
+  }, API_INTERVALO_ATUALIZACAO_MS);
+}
+
+function aplicarModoApiReal(ativo) {
+  usandoApiReal = ativo;
+  document.body.classList.toggle("modo-api-real", ativo);
+
+  // A simulação não faz sentido com dados reais.
+  const cfgSimulacao = document.getElementById("cfg-simulacao-ativa");
+  if (cfgSimulacao) {
+    cfgSimulacao.checked = !ativo && simConfig.ativa;
+    cfgSimulacao.disabled = ativo;
+  }
+
+  PAINEIS_SO_EXEMPLO.forEach((id) =>
+    marcarPainel(id, ativo, "EXEMPLO", "Ainda não existe rota no backend para estes dados")
+  );
+
+  // Criar/editar/excluir vagas só existe no navegador (não há rota no
+  // backend): com dados reais isso seria desfeito na próxima atualização,
+  // então os botões ficam escondidos (ver .modo-api-real no CSS).
+  marcarPainel(
+    "panel-vagas-lista",
+    ativo,
+    "SOMENTE LEITURA",
+    "Cadastro de vagas ainda não tem rota no backend"
+  );
+}
+
+function marcarPainel(panelId, ativo, texto, dica) {
+  const grupo = document.querySelector(`#${panelId} .panel__title-group`);
+  if (!grupo) return;
+  let selo = grupo.querySelector(".selo-exemplo");
+  if (ativo && !selo) {
+    selo = document.createElement("span");
+    selo.className = "status-pill status-pill--simulado selo-exemplo";
+    selo.title = dica;
+    selo.textContent = texto;
+    grupo.appendChild(selo);
+  } else if (!ativo && selo) {
+    selo.remove();
+  }
 }
 
 // ---------------------------------------------------------------------
@@ -416,10 +495,17 @@ async function carregarEIniciar() {
 
   esconderCarregando();
 
+  aplicarModoApiReal(!dados.usandoMock);
+
   if (dados.usandoMock) {
+    if (atualizacaoApiId) clearInterval(atualizacaoApiId);
     mostrarErroConexao(
-      "Não foi possível conectar à API real (esperado, pois as rotas do backend ainda não existem) — mostrando dados de exemplo."
+      API_BASE
+        ? `Não foi possível conectar à API em ${API_BASE} — mostrando dados de exemplo (simulação). Confira se o backend está rodando.`
+        : "Site publicado sem backend — mostrando dados de exemplo (simulação)."
     );
+  } else {
+    iniciarAtualizacaoApi();
   }
 
   renderTudo();

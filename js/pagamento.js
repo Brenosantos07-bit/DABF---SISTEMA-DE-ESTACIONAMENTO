@@ -1,3 +1,13 @@
+/**
+ * pagamento.js — Tela de pagamento (Breno)
+ *
+ * pagamento.html?id=TOKEN
+ * Mostra o resumo do ticket (GET /api/tickets/{token}) e, ao confirmar,
+ * envia POST /api/tickets/{token}/pagamento com o método escolhido
+ * (PIX, CARTAO ou DINHEIRO). Sem servidor, simula o pagamento
+ * (modo demonstração).
+ */
+
 const parametros =
     new URLSearchParams(window.location.search);
 
@@ -6,53 +16,107 @@ const idTicket =
     parametros.get("id");
 
 
-console.log(
-    "Ticket recebido:",
-    idTicket
-);
-
-const ticket = {
-
-    id: idTicket,
-
-    placa: "QKP-8166",
-
-    vaga: "C-12",
-
-    tempo: "01:30:23",
-
-    valor: 11.00
-
-};
-
-document.getElementById("placa").textContent =
-    ticket.placa;
+const botaoConfirmar =
+    document.getElementById("confirmarPagamento");
 
 
-document.getElementById("vaga").textContent =
-    ticket.vaga;
+const textoOriginalBotao =
+    botaoConfirmar.innerHTML;
 
 
-document.getElementById("tempo").textContent =
-    ticket.tempo;
+let modoDemonstracao = false;
 
 
-const valorFormatado =
-    ticket.valor.toLocaleString(
-        "pt-BR",
-        {
-            style: "currency",
-            currency: "BRL"
+/* ==============================
+   RESUMO DO TICKET
+============================== */
+
+function preencherResumo(ticket) {
+
+    document.getElementById("placa").textContent =
+        DABF_API.formatarPlaca(ticket.placa);
+
+
+    document.getElementById("vaga").textContent =
+        ticket.vaga;
+
+
+    document.getElementById("tempo").textContent =
+        DABF_API.formatarTempo(ticket.tempo_segundos);
+
+
+    const valorFormatado =
+        DABF_API.formatarMoeda(ticket.valor);
+
+
+    document.getElementById("valor").textContent =
+        valorFormatado;
+
+
+    document.getElementById("total").textContent =
+        valorFormatado;
+
+}
+
+
+async function carregarResumo() {
+
+    if (!idTicket) {
+
+        alert("Ticket não informado. Acesse pelo QR Code do seu ticket.");
+
+        botaoConfirmar.disabled = true;
+
+        return;
+
+    }
+
+    try {
+
+        const ticket =
+            await DABF_API.buscarTicket(idTicket);
+
+
+        // Já pago? Vai direto para o comprovante.
+        if (ticket.status !== "ABERTO") {
+
+            window.location.href =
+                DABF_API.link("confirmacao.html", { id: idTicket });
+
+            return;
+
         }
-    );
 
 
-document.getElementById("valor").textContent =
-    valorFormatado;
+        preencherResumo(ticket);
+
+    } catch (erro) {
+
+        if (erro.status === 404) {
+
+            alert("Ticket não encontrado.");
+
+            botaoConfirmar.disabled = true;
+
+            return;
+
+        }
 
 
-document.getElementById("total").textContent =
-    valorFormatado;
+        modoDemonstracao = true;
+
+        DABF_API.mostrarAvisoDemonstracao();
+
+        preencherResumo(DABF_API.ticketDemonstracao());
+
+    }
+
+}
+
+
+/* ==============================
+   ESCOLHA DO MÉTODO
+============================== */
 
 const metodos =
     document.querySelectorAll(
@@ -86,15 +150,38 @@ metodos.forEach(function (metodo) {
 
 });
 
-const botaoConfirmar =
-    document.getElementById(
-        "confirmarPagamento"
-    );
+
+/* ==============================
+   CONFIRMAR PAGAMENTO
+============================== */
+
+function irParaConfirmacao(formaPagamento) {
+
+    window.location.href =
+        DABF_API.link("confirmacao.html", {
+            id: idTicket,
+            forma: formaPagamento
+        });
+
+}
+
+
+function liberarBotao() {
+
+    botaoConfirmar.disabled = false;
+
+    botaoConfirmar.innerHTML = textoOriginalBotao;
+
+    if (window.lucide) {
+        lucide.createIcons();
+    }
+
+}
 
 
 botaoConfirmar.addEventListener(
     "click",
-    function () {
+    async function () {
 
         const metodoSelecionado =
             document.querySelector(
@@ -113,14 +200,9 @@ botaoConfirmar.addEventListener(
         }
 
 
+        // PIX / CARTAO / DINHEIRO — exatamente como a API espera
         const formaPagamento =
             metodoSelecionado.value;
-
-
-        console.log(
-            "Forma escolhida:",
-            formaPagamento
-        );
 
 
         botaoConfirmar.disabled = true;
@@ -130,18 +212,52 @@ botaoConfirmar.addEventListener(
             "PROCESSANDO...";
 
 
-        setTimeout(
-            function () {
+        if (modoDemonstracao) {
 
-                window.location.href =
-                    `confirmacao.html?id=${idTicket}&forma=${encodeURIComponent(formaPagamento)}`;
+            setTimeout(
+                function () {
+                    irParaConfirmacao(formaPagamento);
+                },
+                1000
+            );
 
-            },
-            1000
-        );
+            return;
+
+        }
+
+
+        try {
+
+            await DABF_API.pagarTicket(idTicket, formaPagamento);
+
+            irParaConfirmacao(formaPagamento);
+
+        } catch (erro) {
+
+            // 409: o ticket já tinha sido pago (ex.: clique duplo)
+            if (erro.status === 409) {
+
+                irParaConfirmacao(formaPagamento);
+
+                return;
+
+            }
+
+
+            alert(
+                erro.status === 0
+                    ? "Sem conexão com o servidor. Tente novamente."
+                    : `Não foi possível concluir o pagamento: ${erro.message}`
+            );
+
+
+            liberarBotao();
+
+        }
 
     }
 );
+
 
 const voltarTicket =
     document.getElementById(
@@ -150,4 +266,7 @@ const voltarTicket =
 
 
 voltarTicket.href =
-    `ticket.html?id=${idTicket}`;
+    DABF_API.link("ticket.html", { id: idTicket || "" });
+
+
+carregarResumo();

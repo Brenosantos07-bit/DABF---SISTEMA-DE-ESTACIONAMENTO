@@ -20,7 +20,10 @@ from database.connection import get_connection, transacao
 from database.init_db import init_db, SEED_VAGAS
 from repositories import dashboard_repository, pagamento_repository, ticket_repository, vaga_repository
 from services.ticket_service import VeiculoComTicketAtivoError, registrar_entrada
-from services.vaga_service import SemVagaDisponivelError
+from services.pagamento_service import TicketJaPagoError, pagar_ticket
+from services.saida_service import SaidaNaoAutorizadaError, VeiculoNaoEncontradoError, confirmar_saida
+from services.ticket_service import buscar_ticket_por_token
+from services.vaga_service import SemVagaDisponivelError, atualizar_ocupacao
 
 TOTAL_VAGAS = len(SEED_VAGAS)
 
@@ -246,7 +249,7 @@ class TestConsultasDashboard(BaseBancoTemporario):
         self.assertRegex(a01["entrada"], r"^\d{2}:\d{2}:\d{2}$")
 
         a02 = next(v for v in vagas if v["codigo"] == "A02")
-        self.assertEqual(a02, {"bloco": "A", "codigo": "A02", "status": "livre"})
+        self.assertEqual(a02, {"id": 2, "bloco": "A", "codigo": "A02", "status": "livre"})
 
     def test_movimentacoes_recentes_dentro_e_saiu(self):
         r1 = registrar_entrada(self.conn, "AAA1111")
@@ -265,6 +268,134 @@ class TestConsultasDashboard(BaseBancoTemporario):
         for i in range(5):
             registrar_entrada(self.conn, f"LIM{i:04d}")
         self.assertEqual(len(dashboard_repository.movimentacoes_recentes(self.conn, limite=3)), 3)
+
+
+class TestPagamentoESaida(BaseBancoTemporario):
+    def test_pagamento_e_saida_pelo_servico(self):
+        r = registrar_entrada(self.conn, "ABC1D23")
+        pago = pagar_ticket(self.conn, r["token"], "PIX")
+        self.assertEqual(pago["status"], "APROVADO")
+        with self.assertRaises(TicketJaPagoError):
+            pagar_ticket(self.conn, r["token"], "PIX")
+
+        saida = confirmar_saida(self.conn, "ABC1D23")
+        self.assertEqual(saida["status"], "FINALIZADO")
+        with self.assertRaises(VeiculoNaoEncontradoError):
+            confirmar_saida(self.conn, "ABC1D23")
+        self.assertEstadosConsistentes()
+
+    def test_saida_sem_pagamento_e_recusada(self):
+        registrar_entrada(self.conn, "ABC1D23")
+        with self.assertRaises(SaidaNaoAutorizadaError):
+            confirmar_saida(self.conn, "ABC1D23")
+
+    def test_valor_fica_congelado_depois_de_pago(self):
+        r = registrar_entrada(self.conn, "ABC1D23")
+        # simula um carro que entrou há 3h10min
+        self.conn.execute(
+            "UPDATE tickets SET entrada = datetime('now', 'localtime', '-190 minutes') WHERE token = ?",
+            (r["token"],),
+        )
+        self.conn.execute(
+            "UPDATE tickets SET entrada = replace(entrada, ' ', 'T') WHERE token = ?", (r["token"],)
+        )
+        self.conn.commit()
+        pago = pagar_ticket(self.conn, r["token"], "CARTAO")
+        self.assertEqual(pago["valor"], 44.0)  # 4 horas iniciadas x R$ 11
+
+        # mais 2 horas depois do pagamento: o ticket NÃO pode ficar mais caro
+        self.conn.execute(
+            "UPDATE tickets SET entrada = datetime('now', 'localtime', '-310 minutes') WHERE token = ?",
+            (r["token"],),
+        )
+        self.conn.execute(
+            "UPDATE tickets SET entrada = replace(entrada, ' ', 'T') WHERE token = ?", (r["token"],)
+        )
+        self.conn.commit()
+        self.assertEqual(buscar_ticket_por_token(self.conn, r["token"])["valor"], 44.0)
+
+    def test_banco_recusa_segundo_pagamento_aprovado(self):
+        r = registrar_entrada(self.conn, "ABC1D23")
+        ticket = self.pagar(r["token"])
+        with self.assertRaises(sqlite3.IntegrityError):
+            with transacao(self.conn):
+                pagamento_repository.criar(self.conn, ticket["id"], "PIX", 11.0, "APROVADO", "2026-01-01T00:00:00")
+
+
+class TestPagamentoESaidaConcorrentes(BaseBancoTemporario):
+    def _disparar(self, funcao, vezes):
+        barreira = threading.Barrier(vezes)
+        resultados, trava = [], threading.Lock()
+
+        def rodar():
+            conn = get_connection()
+            try:
+                barreira.wait()
+                r = funcao(conn)
+            except Exception as e:  # noqa: BLE001
+                r = e
+            finally:
+                conn.close()
+            with trava:
+                resultados.append(r)
+
+        threads = [threading.Thread(target=rodar) for _ in range(vezes)]
+        for t in threads:
+            t.start()
+        for t in threads:
+            t.join()
+        return resultados
+
+    def test_clique_duplo_no_pagamento_cobra_uma_vez_so(self):
+        r = registrar_entrada(self.conn, "ABC1D23")
+        resultados = self._disparar(lambda c: pagar_ticket(c, r["token"], "PIX"), 6)
+        aprovados = [x for x in resultados if isinstance(x, dict)]
+        self.assertEqual(len(aprovados), 1, resultados)
+        self.assertTrue(all(isinstance(x, TicketJaPagoError) for x in resultados if not isinstance(x, dict)))
+        self.assertEqual(self.contar("SELECT COUNT(*) FROM pagamentos"), 1)
+        self.assertEqual(dashboard_repository.resumo(self.conn)["faturamento_hoje"], 11.0)
+
+    def test_saida_confirmada_duas_vezes_ao_mesmo_tempo(self):
+        r = registrar_entrada(self.conn, "ABC1D23")
+        self.pagar(r["token"])
+        resultados = self._disparar(lambda c: confirmar_saida(c, "ABC1D23"), 4)
+        self.assertEqual(len([x for x in resultados if isinstance(x, dict)]), 1, resultados)
+        self.assertEqual(self.contar("SELECT COUNT(*) FROM movimentacoes WHERE tipo = 'SAIDA'"), 1)
+        self.assertEstadosConsistentes()
+
+
+class TestSensorDeVaga(BaseBancoTemporario):
+    def test_carro_estaciona_e_sai_da_vaga_com_ticket(self):
+        r = registrar_entrada(self.conn, "ABC1D23")
+        vaga_id = ticket_repository.buscar_por_token(self.conn, r["token"])["vaga_id"]
+
+        self.assertEqual(atualizar_ocupacao(self.conn, vaga_id, True)["status"], "OCUPADA")
+        self.assertEqual(atualizar_ocupacao(self.conn, vaga_id, True)["status"], "OCUPADA")  # repetido
+        self.assertEqual(self.contar("SELECT COUNT(*) FROM movimentacoes WHERE tipo = 'OCUPACAO'"), 1)
+
+        self.assertEqual(atualizar_ocupacao(self.conn, vaga_id, False)["status"], "RESERVADA")
+        self.assertEstadosConsistentes()
+
+    def test_sensor_em_vaga_livre_nao_prende_a_vaga(self):
+        """Bug corrigido: antes a vaga livre virava OCUPADA/RESERVADA sem ticket e ficava presa."""
+        resp = atualizar_ocupacao(self.conn, 5, True)
+        self.assertEqual(resp["status"], "LIVRE")
+        self.assertIsNotNone(resp["alerta"])
+        self.assertEqual(atualizar_ocupacao(self.conn, 5, False)["status"], "LIVRE")
+        self.assertEstadosConsistentes()
+
+    def test_sensor_depois_da_saida_nao_prende_a_vaga(self):
+        r = registrar_entrada(self.conn, "ABC1D23")
+        ticket = self.pagar(r["token"])
+        self.finalizar(ticket["id"])
+        self.assertEqual(atualizar_ocupacao(self.conn, ticket["vaga_id"], False)["status"], "LIVRE")
+        self.assertEstadosConsistentes()
+
+    def test_banco_recusa_ocupar_vaga_sem_ticket(self):
+        with self.assertRaises(sqlite3.IntegrityError):
+            with transacao(self.conn):
+                self.conn.execute("UPDATE vagas SET status = 'OCUPADA' WHERE id = 3")
+        self.assertEstadosConsistentes()
 
 
 if __name__ == "__main__":

@@ -70,6 +70,11 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_um_ticket_ativo_por_veiculo
 CREATE UNIQUE INDEX IF NOT EXISTS idx_uma_vaga_por_ticket_ativo
     ON tickets(vaga_id) WHERE status IN ('ABERTO', 'PAGO');
 
+-- Um ticket só pode ter UM pagamento aprovado (evita cobrança em dobro
+-- quando o motorista clica duas vezes em "pagar").
+CREATE UNIQUE INDEX IF NOT EXISTS idx_um_pagamento_aprovado_por_ticket
+    ON pagamentos(ticket_id) WHERE status = 'APROVADO';
+
 -- ------------------------------------------------------------------
 -- Regras de consistência de estados (triggers)
 -- O banco recusa qualquer combinação incoerente entre ticket e vaga,
@@ -116,6 +121,20 @@ BEGIN
     UPDATE vagas SET status = 'LIVRE' WHERE id = NEW.vaga_id;
     UPDATE tickets SET saida = strftime('%Y-%m-%dT%H:%M:%S', 'now', 'localtime')
     WHERE id = NEW.id AND saida IS NULL;
+END;
+
+-- Sensor: vaga só fica OCUPADA (ou volta de OCUPADA para RESERVADA)
+-- se existir um ticket ativo nela. Impede vaga presa sem ticket.
+CREATE TRIGGER IF NOT EXISTS trg_vaga_ocupacao_exige_ticket
+BEFORE UPDATE OF status ON vagas
+WHEN (NEW.status = 'OCUPADA' AND OLD.status <> 'OCUPADA')
+  OR (NEW.status = 'RESERVADA' AND OLD.status = 'OCUPADA')
+BEGIN
+    SELECT RAISE(ABORT, 'Vaga sem ticket ativo nao pode ser ocupada pelo sensor')
+    WHERE NOT EXISTS (
+        SELECT 1 FROM tickets
+        WHERE vaga_id = NEW.id AND status IN ('ABERTO', 'PAGO')
+    );
 END;
 
 -- Vaga com ticket ativo (ABERTO/PAGO) não pode voltar a ficar LIVRE.

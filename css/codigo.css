@@ -1,0 +1,535 @@
+/* ==============================================
+   codigo.css — Ticket impresso com QR Code
+   Mesma identidade do ticket digital (ticket.css):
+   fundo #161616, cartões #292929, destaque #e6a915
+============================================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+
+body {
+    min-height: 100vh;
+
+    background: #161616;
+
+    color: #ffffff;
+
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+
+/* ==============================
+   PÁGINA
+============================== */
+
+.codigo-page {
+    width: 100%;
+    max-width: 430px;
+
+    min-height: 100vh;
+
+    margin: 0 auto;
+
+    padding: 28px 20px 35px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+
+/* ==============================
+   TICKET (o "papel")
+============================== */
+
+.ticket-impresso {
+    --papel: #232323;
+    --furo: #161616;
+    --ouro: #e6a915;
+
+    position: relative;
+
+    width: 100%;
+    max-width: 360px;
+
+    background: var(--papel);
+
+    border-radius: 18px 18px 0 0;
+
+    padding: 24px 22px 30px;
+
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.35);
+
+    /* borda de baixo serrilhada, como papel destacado */
+    -webkit-mask:
+        radial-gradient(circle 7px at 50% 100%, transparent 98%, #000) 50% 100% / 18px 100% repeat-x;
+    mask:
+        radial-gradient(circle 7px at 50% 100%, transparent 98%, #000) 50% 100% / 18px 100% repeat-x;
+}
+
+
+/* ==============================
+   CABEÇALHO
+============================== */
+
+.ti-header {
+    text-align: center;
+}
+
+
+.ti-logo {
+    width: 112px;
+    height: auto;
+
+    margin-bottom: 6px;
+}
+
+
+.ti-header h1 {
+    font-size: 17px;
+    font-weight: 800;
+    letter-spacing: 1.6px;
+
+    margin-bottom: 4px;
+}
+
+
+.ti-header p {
+    color: #8d8d8d;
+
+    font-size: 12.5px;
+}
+
+
+/* ==============================
+   NÚMERO DO TICKET
+============================== */
+
+.ti-numero {
+    margin: 18px 0 16px;
+
+    padding: 10px 0;
+
+    border-top: 1px solid #3a3a3a;
+    border-bottom: 1px solid #3a3a3a;
+
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+}
+
+
+.ti-numero span {
+    color: #919191;
+
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+
+.ti-numero strong {
+    color: var(--ouro);
+
+    font-family: "Courier New", Courier, monospace;
+    font-size: 30px;
+    font-weight: 700;
+    letter-spacing: 3px;
+}
+
+
+/* ==============================
+   DADOS
+============================== */
+
+.ti-dados {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px 16px;
+}
+
+
+.ti-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    min-width: 0;
+}
+
+
+.ti-item > svg {
+    width: 21px;
+    height: 21px;
+    min-width: 21px;
+
+    color: var(--ouro);
+
+    stroke-width: 2.2;
+}
+
+
+.ti-item div {
+    display: flex;
+    flex-direction: column;
+
+    min-width: 0;
+}
+
+
+.ti-item span {
+    color: #919191;
+
+    font-size: 11.5px;
+}
+
+
+.ti-item strong {
+    font-size: 16px;
+    font-weight: 700;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+
+/* ==============================
+   LINHA PICOTADA (com "furos" laterais)
+============================== */
+
+.ti-picote {
+    position: relative;
+
+    height: 0;
+
+    margin: 24px -22px;
+
+    border-top: 2px dashed #4a4a4a;
+}
+
+
+.ti-picote::before,
+.ti-picote::after {
+    content: "";
+
+    position: absolute;
+    top: -13px;
+
+    width: 24px;
+    height: 24px;
+
+    border-radius: 50%;
+
+    background: var(--furo);
+}
+
+
+.ti-picote::before {
+    left: -12px;
+}
+
+
+.ti-picote::after {
+    right: -12px;
+}
+
+
+/* ==============================
+   QR CODE
+============================== */
+
+.ti-qr {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    text-align: center;
+}
+
+
+.ti-qr-moldura {
+    background: #ffffff;
+
+    /* margem branca em volta do QR: ajuda a câmera a reconhecer */
+    padding: 20px;
+
+    border-radius: 14px;
+
+    border: 3px solid var(--ouro);
+
+    margin-bottom: 14px;
+}
+
+
+.ti-qr-codigo {
+    width: 196px;
+    height: 196px;
+}
+
+
+.ti-qr-codigo img,
+.ti-qr-codigo canvas {
+    display: block;
+
+    width: 196px !important;
+    height: 196px !important;
+}
+
+
+.ti-qr-titulo {
+    font-size: 15px;
+
+    margin-bottom: 4px;
+}
+
+
+.ti-qr-texto {
+    color: #a3a3a3;
+
+    font-size: 12.5px;
+    line-height: 1.45;
+
+    max-width: 250px;
+}
+
+
+.ti-token {
+    margin-top: 12px;
+
+    padding: 6px 12px;
+
+    border-radius: 999px;
+
+    background: #1b1b1b;
+
+    color: #8d8d8d;
+
+    font-size: 11.5px;
+}
+
+
+.ti-token b {
+    color: #ffffff;
+
+    font-family: "Courier New", Courier, monospace;
+    letter-spacing: 1.5px;
+}
+
+
+/* ==============================
+   RODAPÉ
+============================== */
+
+.ti-rodape {
+    margin-top: 22px;
+
+    padding-top: 16px;
+
+    border-top: 1px solid #3a3a3a;
+
+    text-align: center;
+}
+
+
+.ti-tarifa {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    margin-bottom: 10px;
+
+    font-size: 13px;
+    color: #d0d0d0;
+}
+
+
+.ti-tarifa svg {
+    width: 18px;
+    height: 18px;
+
+    color: var(--ouro);
+}
+
+
+.ti-tarifa b {
+    color: var(--ouro);
+}
+
+
+.ti-rodape p {
+    color: #8d8d8d;
+
+    font-size: 11.5px;
+    line-height: 1.45;
+}
+
+
+.ti-rodape .ti-aviso {
+    margin-top: 6px;
+
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+
+    color: #6a6a6a;
+}
+
+
+/* ==============================
+   BOTÕES
+============================== */
+
+.codigo-acoes {
+    width: 100%;
+    max-width: 360px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+
+.btn-imprimir,
+.btn-secundario {
+    width: 100%;
+    height: 54px;
+
+    border-radius: 14px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    text-decoration: none;
+
+    transition: transform 0.15s, filter 0.15s;
+}
+
+
+.btn-imprimir {
+    border: none;
+
+    background: #e6a915;
+
+    color: #161616;
+
+    letter-spacing: 0.5px;
+}
+
+
+.btn-secundario {
+    border: 1px solid #414141;
+
+    background: transparent;
+
+    color: #ffffff;
+}
+
+
+.btn-imprimir:hover,
+.btn-secundario:hover {
+    filter: brightness(1.08);
+}
+
+
+.btn-imprimir:active,
+.btn-secundario:active {
+    transform: scale(0.98);
+}
+
+
+.btn-imprimir svg,
+.btn-secundario svg {
+    width: 20px;
+    height: 20px;
+}
+
+
+/* ==============================
+   AVISOS (para quem está apresentando)
+============================== */
+
+.codigo-avisos {
+    width: 100%;
+    max-width: 360px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+
+.codigo-aviso {
+    padding: 10px 12px;
+
+    border-radius: 10px;
+
+    background: #2a2414;
+
+    border: 1px solid #5c4a17;
+
+    color: #e8cf8a;
+
+    font-size: 12px;
+    line-height: 1.45;
+
+    overflow-wrap: anywhere;
+}
+
+
+.codigo-aviso code {
+    color: #ffffff;
+}
+
+
+/* ==============================
+   IMPRESSÃO
+   Mantém as cores do ticket e esconde botões/avisos.
+============================== */
+
+@media print {
+
+    @page {
+        margin: 8mm;
+    }
+
+    html,
+    body {
+        background: #ffffff;
+
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    .codigo-page {
+        min-height: auto;
+
+        padding: 0;
+    }
+
+    .ticket-impresso {
+        --furo: #ffffff;
+
+        box-shadow: none;
+
+        break-inside: avoid;
+    }
+
+    .codigo-acoes,
+    .codigo-avisos {
+        display: none !important;
+    }
+}

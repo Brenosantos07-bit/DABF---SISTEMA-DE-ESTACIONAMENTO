@@ -5,6 +5,7 @@ from typing import Optional
 
 from database.connection import transacao
 from repositories import (
+    pagamento_repository,
     veiculo_repository,
     ticket_repository,
     vaga_repository,
@@ -23,14 +24,17 @@ def _gerar_token() -> str:
     return secrets.token_hex(5)  # 10 caracteres, ex: a7f93b81x2
 
 
-def calcular_tempo_e_valor(entrada_iso: str) -> tuple[int, float]:
+def calcular_tempo_e_valor(entrada_iso: str, ate_iso: Optional[str] = None) -> tuple[int, float]:
     """
     Tempo decorrido (segundos) e valor a cobrar a partir do horário de entrada.
     Hora iniciada conta inteira (mínimo 1h), igual tarifa de estacionamento real.
     Usado tanto na consulta do ticket (GET) quanto no pagamento (POST).
+
+    ate_iso: fim da contagem (ex.: horário do pagamento). Se não vier, usa agora.
     """
     entrada_dt = datetime.fromisoformat(entrada_iso)
-    tempo_segundos = int((datetime.now() - entrada_dt).total_seconds())
+    fim_dt = datetime.fromisoformat(ate_iso) if ate_iso else datetime.now()
+    tempo_segundos = max(0, int((fim_dt - entrada_dt).total_seconds()))
     horas = max(1, -(-tempo_segundos // 3600))  # arredonda pra cima
     valor = round(horas * VALOR_HORA, 2)
     return tempo_segundos, valor
@@ -92,7 +96,15 @@ def buscar_ticket_por_token(conn: Connection, token: str) -> Optional[dict]:
     veiculo = veiculo_repository.buscar_por_id(conn, ticket["veiculo_id"])
     vaga = vaga_repository.buscar_por_id(conn, ticket["vaga_id"])
 
-    tempo_segundos, valor = calcular_tempo_e_valor(ticket["entrada"])
+    pagamento = pagamento_repository.buscar_aprovado_por_ticket(conn, ticket["id"])
+
+    if pagamento is not None:
+        # Depois de pago, o valor e o tempo ficam "congelados" no momento
+        # do pagamento — o ticket não pode continuar aumentando de preço.
+        tempo_segundos, _ = calcular_tempo_e_valor(ticket["entrada"], pagamento["pago_em"])
+        valor = float(pagamento["valor"])
+    else:
+        tempo_segundos, valor = calcular_tempo_e_valor(ticket["entrada"])
 
     return {
         "numero": ticket["numero"],

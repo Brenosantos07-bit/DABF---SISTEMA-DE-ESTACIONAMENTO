@@ -18,13 +18,37 @@ uvicorn main:app --reload
 API sobe em `http://localhost:8000`. Documentação automática (Swagger) em
 `http://localhost:8000/docs`.
 
-## Endpoints já implementados (sprint 1)
+## Endpoints
 
-| Método | Rota | Status |
+| Método | Rota | O que faz |
 |---|---|---|
-| GET | `/api/health` | ✅ |
-| POST | `/api/entrada` | ✅ |
-| GET | `/api/tickets/{token}` | ✅ |
+| GET | `/api/health` | Verifica se a API está no ar |
+| POST | `/api/entrada` | Registra a entrada (placa), reserva vaga e cria o ticket. 409 se a placa já está dentro ou se lotou |
+| GET | `/api/tickets/{token}` | Dados do ticket (tempo e valor; depois de pago, o valor fica fixo) |
+| POST | `/api/tickets/{token}/pagamento` | Paga o ticket (`PIX`, `CARTAO` ou `DINHEIRO`). 409 se já foi pago |
+| GET | `/api/vagas` | Vagas no formato do dashboard (inclui `id`, usado pelo sensor) |
+| POST | `/api/vagas/{id}/ocupacao` | Leitura do sensor da vaga (`{"ocupada": true/false}`) |
+| GET | `/api/dashboard/resumo` | Totais de vagas e faturamento do dia |
+| GET | `/api/movimentacoes/recentes` | Últimas entradas (`?limite=20`) |
+| POST | `/api/saida/verificar` | Diz se a placa pode sair (ticket pago) |
+| POST | `/api/saida/confirmar` | Finaliza o ticket e libera a vaga. 409 se não foi pago |
+
+### Acessar pelo celular (mesma rede Wi-Fi)
+
+Por padrão o uvicorn só aceita conexões do próprio computador. Para o
+celular conseguir falar com a API, suba com:
+
+```bash
+uvicorn main:app --reload --host 0.0.0.0
+```
+
+e libere a porta 8000 no firewall do Windows se ele perguntar.
+
+## Testes
+
+```bash
+python -m unittest discover -s tests -v
+```
 
 ## Testando rápido
 
@@ -52,13 +76,3 @@ backend/
 ├── services/                  # regras de negócio (chamam repositories)
 └── repositories/              # SQL puro (única camada que toca o banco)
 ```
-
-## Próximos passos (Gomes)
-
-- [ ] `POST /api/tickets/{token}/pagamento`
-- [ ] `GET /api/vagas`
-- [ ] `GET /api/dashboard/resumo`
-- [ ] `GET /api/movimentacoes/recentes`
-- [ ] `POST /api/vagas/{id}/ocupacao`
-- [ ] `POST /api/saida/verificar`
-- [ ] `POST /api/saida/confirmar`

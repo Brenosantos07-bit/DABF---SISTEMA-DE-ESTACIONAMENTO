@@ -54,6 +54,7 @@ def listar_vagas(conn: Connection) -> list[dict]:
     rows = conn.execute(
         """
         SELECT
+            v.id                                           AS id,
             substr(v.codigo, 1, 1)                         AS bloco,
             v.codigo                                       AS codigo,
             CASE WHEN v.status = 'LIVRE' THEN 'livre' ELSE 'ocupada' END AS status,
@@ -70,7 +71,12 @@ def listar_vagas(conn: Connection) -> list[dict]:
 
     vagas = []
     for row in rows:
-        vaga = {"bloco": row["bloco"], "codigo": row["codigo"], "status": row["status"]}
+        vaga = {
+            "id": row["id"],  # usado pela automação (sensor) em /api/vagas/{id}/ocupacao
+            "bloco": row["bloco"],
+            "codigo": row["codigo"],
+            "status": row["status"],
+        }
         if row["placa"] is not None:  # só vagas com ticket ativo têm placa/entrada
             vaga["placa"] = row["placa"]
             vaga["entrada"] = row["entrada"]
